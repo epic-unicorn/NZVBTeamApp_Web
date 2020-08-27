@@ -4,6 +4,8 @@ import 'package:NZVBTeamApp_Web/tabs/ranking_tab.dart';
 import 'package:NZVBTeamApp_Web/tabs/results_tab.dart';
 import 'package:NZVBTeamApp_Web/tabs/schedule_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:NZVBTeamApp_Web/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
@@ -50,13 +52,15 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text('Mijn competitie'),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.ad_units_sharp),
+              icon: Icon(FontAwesome.trophy),
               color: Theme.of(context).accentIconTheme.color,
               onPressed: () async {},
             ),
             IconButton(
               icon: Icon(Icons.settings), color: Theme.of(context).accentIconTheme.color,
-              onPressed: () async {},
+              onPressed: () async {
+                await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Settings()));
+              },
             ),
           ],
           bottom: TabBar(
