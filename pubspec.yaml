@@ -22,7 +22,9 @@ environment:
 
 dependencies:
   shared_preferences: ^0.5.8
+  http: ^0.12.2
   provider: ^4.3.2
+  date_format: ^1.0.8
   flutter:
     sdk: flutter
 

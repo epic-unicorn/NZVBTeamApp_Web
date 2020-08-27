@@ -1,5 +1,8 @@
 import 'package:NZVBTeamApp_Web/utils/theme_notifier.dart';
 import 'package:NZVBTeamApp_Web/utils/themes.dart';
+import 'package:NZVBTeamApp_Web/tabs/ranking_tab.dart';
+import 'package:NZVBTeamApp_Web/tabs/results_tab.dart';
+import 'package:NZVBTeamApp_Web/tabs/schedule_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -18,61 +21,65 @@ void main() {
 }
 
 class MyNzvbApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'NZVB Team App',
       theme: themeNotifier.getTheme(),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
+        appBar: AppBar(
+          title: Text('Mijn competitie'),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.ad_units_sharp),
+              color: Theme.of(context).accentIconTheme.color,
+              onPressed: () async {},
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            IconButton(
+              icon: Icon(Icons.settings), color: Theme.of(context).accentIconTheme.color,
+              onPressed: () async {},
             ),
+          ],
+          bottom: TabBar(
+              tabs: [
+                Tab(text: 'Stand'),
+                Tab(text: 'Programma'),
+                Tab(text: 'Uitslagen'),
+              ],
+          ),
+        ),
+        bottomNavigationBar:
+          Container(
+            height: 50.0,
+            color: Theme.of(context).backgroundColor,
+          ),
+        body: TabBarView(
+          children: [
+            RankingTab("my team"),
+            ScheduleTab("my team"),
+            ResultsTab("my team"),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
