@@ -1,4 +1,4 @@
-import 'package:NZVBTeamApp_Web/select_competition.dart';
+import 'package:NZVBTeamApp_Web/select_league.dart';
 import 'package:NZVBTeamApp_Web/utils/theme_notifier.dart';
 import 'package:NZVBTeamApp_Web/utils/themes.dart';
 import 'package:NZVBTeamApp_Web/tabs/ranking_tab.dart';
@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
             FlatButton(
               textColor: Colors.white,
               onPressed: () async {
-                await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => SelectCompetition()));
+                await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => SelectLeague()));
               },
               child: Text("HKA"),
               shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
