@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/league.dart';
 
@@ -14,11 +15,12 @@ class SelectLeague extends StatefulWidget {
 
 class _SelectLeagueState extends State<SelectLeague> {
 
-  final String _pouleIdsUrl = 'http://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
+  final String _pouleIdsUrl = 'https://cors-anywhere.herokuapp.com/http://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
   List<League> _leagues = new List<League>();
+  League _selectedLeague = new League('', '');
 
   Future<List<League>> getLeagues() async {
-    var res = await http.get(Uri.encodeFull(_pouleIdsUrl));
+    var res = await http.get(Uri.encodeFull(_pouleIdsUrl), headers: {'X-Requested-With': 'XMLHttpRequest'});
     Map resBody = jsonDecode(res.body);
     var test = resBody.keys.toList()..sort();
     _leagues.clear();
@@ -29,6 +31,12 @@ class _SelectLeagueState extends State<SelectLeague> {
     // hebben we hier niet nodig
     _leagues.removeWhere((x)=> x.name == "Cup poule");
     return _leagues;
+  }
+
+  Future<void> saveLeague() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("leagueId", _selectedLeague.id);
+    prefs.setString("leagueName", _selectedLeague.name);
   }
 
   @override
@@ -53,8 +61,13 @@ class _SelectLeagueState extends State<SelectLeague> {
                   final data = snapshot.data[index];
                   return ListTile(
                     title: Text(data.name),
+                    trailing: Icon(Icons.chevron_right),
                     onTap: () {
-                      // todo
+                      setState(() {
+                        _selectedLeague = data;
+                      });
+                      saveLeague();
+                      Navigator.pop(context, _selectedLeague.name);
                     },
                   );
                 },

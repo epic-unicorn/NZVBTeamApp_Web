@@ -43,6 +43,23 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  String _selectedLeague;
+
+  Future _getSelectedLeague() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if(prefs.getString("leagueId") == null) {
+      setState(() => _selectedLeague = prefs.getString("leagueName"));
+    }
+  }
+
+@override
+  void initState() {
+
+    _getSelectedLeague();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -55,9 +72,11 @@ class _MyHomePageState extends State<MyHomePage> {
             FlatButton(
               textColor: Colors.white,
               onPressed: () async {
-                await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => SelectLeague()));
+                final result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => SelectLeague()));
+                print(result);
+                setState(()=> _selectedLeague = result);
               },
-              child: Text("HKA"),
+              child: Text(_selectedLeague ?? "HKA"),
               shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
             ),
             IconButton(
