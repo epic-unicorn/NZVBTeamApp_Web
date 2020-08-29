@@ -11,14 +11,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-
-   SharedPreferences.getInstance().then((prefs) {
+  SharedPreferences.getInstance().then((prefs) {
     var darkModeOn = prefs.getBool('darkMode') ?? false;
     runApp(
-        ChangeNotifierProvider<ThemeNotifier>(
-          create: (_) => ThemeNotifier(darkModeOn ? darkTheme : lightTheme),
-          child: MyNzvbApp(),
-        ),
+      ChangeNotifierProvider<ThemeNotifier>(
+        create: (_) => ThemeNotifier(darkModeOn ? darkTheme : lightTheme),
+        child: MyNzvbApp(),
+      ),
     );
   });
 }
@@ -36,26 +35,23 @@ class MyNzvbApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   String _selectedLeague;
-
   Future _getSelectedLeague() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    var leagueId = prefs.getString("leagueId");
 
-    if(prefs.getString("leagueId") == null) {
+    if (leagueId != null) {
       setState(() => _selectedLeague = prefs.getString("leagueName"));
     }
   }
 
-@override
+  @override
   void initState() {
-
     _getSelectedLeague();
     super.initState();
   }
@@ -72,9 +68,12 @@ class _MyHomePageState extends State<MyHomePage> {
             FlatButton(
               textColor: Colors.white,
               onPressed: () async {
-                final result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => SelectLeague()));
+                final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => SelectLeague()));
                 print(result);
-                setState(()=> _selectedLeague = result);
+                setState(() => _selectedLeague = result);
               },
               child: Text(_selectedLeague ?? "HKA"),
               shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
@@ -85,28 +84,27 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () async {},
             ),
             IconButton(
-              icon: Icon(Icons.settings), color: Theme.of(context).accentIconTheme.color,
+              icon: Icon(Icons.settings),
+              color: Theme.of(context).accentIconTheme.color,
               onPressed: () async {
-                await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Settings()));
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => Settings()));
               },
             ),
           ],
           bottom: TabBar(
-              tabs: [
-                Tab(text: 'Stand'),
-                Tab(text: 'Programma'),
-                Tab(text: 'Uitslagen'),
-              ],
+            tabs: [
+              Tab(text: 'Stand'),
+              Tab(text: 'Programma'),
+              Tab(text: 'Uitslagen'),
+            ],
           ),
         ),
-        bottomNavigationBar:
-          Container(
-            height: 50.0,
-            color: Theme.of(context).backgroundColor,
-          ),
         body: TabBarView(
           children: [
-            RankingTab("my team"),
+            RankingTab(),
             ScheduleTab("my team"),
             ResultsTab("my team"),
           ],
