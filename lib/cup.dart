@@ -9,7 +9,7 @@ class Cup extends StatefulWidget {
 }
 
 class _CupState extends State<Cup> {
-  List<ListItem> cupResults;
+  List<ListItem> _cupResults = new List<ListItem>();
 
   Future loadCupResults() async {
     final response = await http.get(
@@ -19,40 +19,40 @@ class _CupState extends State<Cup> {
       var result = data[data.keys.first];
       for (var game = 0; game < result.length; game++) {
         var items = result[game];
-        if (cupResults.length != 0) {
+        if (_cupResults.length != 0) {
           if (!roundExist(items['round'].toString())) {
-            cupResults.add(new HeadingItem(items['round'].toString()));
+            _cupResults.add(new HeadingItem(items['round'].toString()));
             if (!matchExist(items['date'], items['team1'], items['team2'],
                 items['result'])) {
-              cupResults.add(new MatchItem(items['date'], items['start'],
+              _cupResults.add(new MatchItem(items['date'], items['start'],
                   items['team1'], items['team2'], items['result']));
             }
           } else {
             if (!matchExist(items['date'], items['team1'], items['team2'],
                 items['result'])) {
-              cupResults.add(new MatchItem(items['date'], items['start'],
+              _cupResults.add(new MatchItem(items['date'], items['start'],
                   items['team1'], items['team2'], items['result']));
             }
           }
         } else {
           // eerste wedstrijd in lijst, hoeven we niet te checken of die al bestaan
-          cupResults.add(new HeadingItem(items['round'].toString()));
-          cupResults.add(new MatchItem(items['date'], items['start'],
+          _cupResults.add(new HeadingItem(items['round'].toString()));
+          _cupResults.add(new MatchItem(items['date'], items['start'],
               items['team1'], items['team2'], items['result']));
         }
       }
     }
-    return cupResults;
+    return _cupResults;
   }
 
   bool roundExist(String name) {
     var test =
-        cupResults.whereType<HeadingItem>().where((x) => x.heading == name);
+        _cupResults.whereType<HeadingItem>().where((x) => x.heading == name);
     return test.length > 0;
   }
 
   bool matchExist(String date, String team1, String team2, String result) {
-    var test = cupResults.whereType<MatchItem>().where((x) =>
+    var test = _cupResults.whereType<MatchItem>().where((x) =>
         x.date == date &&
         x.team1 == team1 &&
         x.team2 == team2 &&
@@ -62,10 +62,9 @@ class _CupState extends State<Cup> {
 
   @override
   void initState() {
-    cupResults = new List<ListItem>();
     super.initState();
 
-    cupResults.clear();
+    _cupResults.clear();
     loadCupResults();
   }
 

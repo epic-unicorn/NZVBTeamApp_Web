@@ -1,3 +1,4 @@
+import 'package:NZVBTeamApp_Web/cup.dart';
 import 'package:NZVBTeamApp_Web/select_league.dart';
 import 'package:NZVBTeamApp_Web/utils/theme_notifier.dart';
 import 'package:NZVBTeamApp_Web/utils/themes.dart';
@@ -9,8 +10,6 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:NZVBTeamApp_Web/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-
-import 'cup.dart';
 
 void main() {
   SharedPreferences.getInstance().then((prefs) {
