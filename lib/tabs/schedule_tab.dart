@@ -6,9 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:date_format/date_format.dart';
 
 class ScheduleTab extends StatefulWidget {
-  final String selectedTeam;
-  ScheduleTab(this.selectedTeam, {Key key}) : super(key: key);
-
   @override
   _ScheduleTabState createState() => _ScheduleTabState();
 }
@@ -106,10 +103,7 @@ class _ScheduleTabState extends State<ScheduleTab>
               itemBuilder: (BuildContext context, int index) {
                 final data = teamSchedule.data[index];
                 return Container(
-                  color: data['team1'] == widget.selectedTeam ||
-                          data['team2'] == widget.selectedTeam
-                      ? Theme.of(context).focusColor
-                      : Theme.of(context).backgroundColor,
+                  color: Theme.of(context).backgroundColor,
                   height: 35,
                   padding: EdgeInsets.only(left: 10.0),
                   child: new Row(

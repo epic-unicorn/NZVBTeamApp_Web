@@ -6,9 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class ResultsTab extends StatefulWidget {
-  final String selectedTeam;
-  ResultsTab(this.selectedTeam, {Key key}) : super(key: key);
-
   @override
   _ResultsTabState createState() => _ResultsTabState();
 }
@@ -106,10 +103,7 @@ class _ResultsTabState extends State<ResultsTab>
               itemBuilder: (BuildContext context, int index) {
                 final data = teamResult.data[index];
                 return Container(
-                  color: data['team1'] == widget.selectedTeam ||
-                          data['team2'] == widget.selectedTeam
-                      ? Theme.of(context).focusColor
-                      : Theme.of(context).backgroundColor,
+                  color: Theme.of(context).backgroundColor,
                   height: 35,
                   padding: EdgeInsets.only(left: 10.0),
                   child: new Row(

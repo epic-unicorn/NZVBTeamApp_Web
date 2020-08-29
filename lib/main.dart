@@ -10,6 +10,8 @@ import 'package:NZVBTeamApp_Web/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
+import 'cup.dart';
+
 void main() {
   SharedPreferences.getInstance().then((prefs) {
     var darkModeOn = prefs.getBool('darkMode') ?? false;
@@ -72,7 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) => SelectLeague()));
-                print(result);
                 setState(() => _selectedLeague = result);
               },
               child: Text(_selectedLeague ?? "HKA"),
@@ -81,7 +82,12 @@ class _MyHomePageState extends State<MyHomePage> {
             IconButton(
               icon: Icon(FontAwesome.trophy),
               color: Theme.of(context).accentIconTheme.color,
-              onPressed: () async {},
+              onPressed: () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => Cup()));
+              },
             ),
             IconButton(
               icon: Icon(Icons.settings),
@@ -105,8 +111,8 @@ class _MyHomePageState extends State<MyHomePage> {
         body: TabBarView(
           children: [
             RankingTab(),
-            ScheduleTab("my team"),
-            ResultsTab("my team"),
+            ScheduleTab(),
+            ResultsTab(),
           ],
         ),
       ),
