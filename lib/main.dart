@@ -1,4 +1,3 @@
-import 'package:NZVBTeamApp_Web/cup.dart';
 import 'package:NZVBTeamApp_Web/select_league.dart';
 import 'package:NZVBTeamApp_Web/utils/theme_notifier.dart';
 import 'package:NZVBTeamApp_Web/utils/themes.dart';
@@ -6,7 +5,6 @@ import 'package:NZVBTeamApp_Web/tabs/ranking_tab.dart';
 import 'package:NZVBTeamApp_Web/tabs/results_tab.dart';
 import 'package:NZVBTeamApp_Web/tabs/schedule_tab.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:NZVBTeamApp_Web/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -77,16 +75,6 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: Text(_selectedLeague ?? "HKA"),
               shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
-            ),
-            IconButton(
-              icon: Icon(FontAwesome.trophy),
-              color: Theme.of(context).accentIconTheme.color,
-              onPressed: () async {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => Cup()));
-              },
             ),
             IconButton(
               icon: Icon(Icons.settings),
