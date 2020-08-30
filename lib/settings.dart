@@ -70,7 +70,7 @@ class _SettingState extends State<Settings> {
                       child: Image(
                         image: AssetImage('google-play-badge.png'),
                         fit: BoxFit.fitHeight,
-                        height: 64,
+                        height: 48,
                       )),
                 )
               ],
