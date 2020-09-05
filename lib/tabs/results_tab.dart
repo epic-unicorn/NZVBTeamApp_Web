@@ -22,7 +22,7 @@ class _ResultsTabState extends State<ResultsTab>
 
     if (_selectedLeague != null) {
       final response = await http.get(
-          "https://thingproxy.freeboard.io/fetch/http://cm.nzvb.nl/modules/nzvb/api/results.php?pouleId=" +
+          "https://cors-anywhere.herokuapp.com/http://cm.nzvb.nl/modules/nzvb/api/results.php?pouleId=" +
               _selectedLeague.id);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
