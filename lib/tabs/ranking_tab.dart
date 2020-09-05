@@ -21,7 +21,7 @@ class _RankingTabState extends State<RankingTab>
 
     if (_selectedLeague != null) {
       final response = await http.get(
-          "https://cors-anywhere.herokuapp.com/https://cm.nzvb.nl/modules/nzvb/api/rankings.php?pouleId=" +
+          "https://thingproxy.freeboard.io/fetch/https://cm.nzvb.nl/modules/nzvb/api/rankings.php?pouleId=" +
               _selectedLeague.id);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);

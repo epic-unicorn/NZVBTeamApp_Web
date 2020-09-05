@@ -22,7 +22,7 @@ class _ScheduleTabState extends State<ScheduleTab>
 
     if (_selectedLeague != null) {
       final response = await http.get(
-          "https://cors-anywhere.herokuapp.com/http://cm.nzvb.nl/modules/nzvb/api/schedule.php?pouleId=" +
+          "https://thingproxy.freeboard.io/fetch/http://cm.nzvb.nl/modules/nzvb/api/schedule.php?pouleId=" +
               _selectedLeague.id);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
