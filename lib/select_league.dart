@@ -25,8 +25,8 @@ class _SelectLeagueState extends State<SelectLeague> {
     var test = resBody.keys.toList()..sort();
     _leagues.clear();
 
-    // ACTIVE COMPETITION ID 2020/2021 = 6
-    Map<String, String> values = Map<String, String>.from(resBody[test[4]]);
+    // ACTIVE LEAGUE ID 2020/2021 = 7 (item 5 in list)
+    Map<String, String> values = Map<String, String>.from(resBody[test[5]]);
     values.forEach((k, v) => _leagues.add(League(k, v)));
     _leagues.removeWhere((x) => x.name == "Cup poule");
     return _leagues;

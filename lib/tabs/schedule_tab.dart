@@ -22,11 +22,11 @@ class _ScheduleTabState extends State<ScheduleTab>
 
     if (_selectedLeague != null) {
       final response = await http.get(
-          "https://cors-anywhere.herokuapp.com/http://cm.nzvb.nl/modules/nzvb/api/schedule.php?pouleId=" +
+          "https://cors-anywhere.herokuapp.com/http://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=7&pouleId=" +
               _selectedLeague.id);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        return data[data.keys.first][_selectedLeague.name];
+        return data['2020/2021'][_selectedLeague.name];
       }
     }
     return null;
@@ -44,7 +44,7 @@ class _ScheduleTabState extends State<ScheduleTab>
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(left: 10.0),
-          height: 38,
+          height: 40,
           color: Theme.of(context).secondaryHeaderColor,
           child: new Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -102,53 +102,55 @@ class _ScheduleTabState extends State<ScheduleTab>
               itemCount: teamSchedule.data.length,
               itemBuilder: (BuildContext context, int index) {
                 final data = teamSchedule.data[index];
-                return Container(
-                  color: Theme.of(context).backgroundColor,
-                  height: 35,
-                  padding: EdgeInsets.only(left: 10.0),
-                  child: new Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          formatDate(DateTime.parse(data['date']), [
-                            dd,
-                            '-',
-                            mm,
-                          ]),
-                        ),
-                        flex: 1,
+                return InkWell(
+                    onTap: () {},
+                    child: new Ink(
+                      color: Theme.of(context).backgroundColor,
+                      height: 40,
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: new Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              formatDate(DateTime.parse(data['date']), [
+                                dd,
+                                '-',
+                                mm,
+                              ]),
+                            ),
+                            flex: 1,
+                          ),
+                          Expanded(
+                            child: Text(
+                              data['start'],
+                            ),
+                            flex: 1,
+                          ),
+                          Expanded(
+                            child: Text(
+                              data['team1'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            flex: 3,
+                          ),
+                          Expanded(
+                            child: Text(
+                              data['team2'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            flex: 3,
+                          ),
+                          Expanded(
+                            child: Text(
+                              data['location'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            flex: 1,
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: Text(
-                          data['start'],
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: Text(
-                          data['team1'],
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        flex: 3,
-                      ),
-                      Expanded(
-                        child: Text(
-                          data['team2'],
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        flex: 3,
-                      ),
-                      Expanded(
-                        child: Text(
-                          data['location'],
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        flex: 1,
-                      ),
-                    ],
-                  ),
-                );
+                    ));
               },
             );
           },
