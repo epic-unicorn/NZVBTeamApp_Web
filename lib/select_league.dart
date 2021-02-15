@@ -14,7 +14,7 @@ class SelectLeague extends StatefulWidget {
 
 class _SelectLeagueState extends State<SelectLeague> {
   final String _pouleIdsUrl =
-      'http://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
+      'https://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
   List<League> _leagues = new List<League>();
   League _selectedLeague = new League('', '');
 
