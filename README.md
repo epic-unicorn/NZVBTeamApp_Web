@@ -1,3 +1,3 @@
 # NZVBTeamApp_Web
 
-NZVBTeamApp for web!
+## NZVBTeamApp gewoon op het web!
