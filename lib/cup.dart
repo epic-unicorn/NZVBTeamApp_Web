@@ -4,6 +4,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class Cup extends StatefulWidget {
+  final String selectedTeam;
+
+  Cup(this.selectedTeam, {Key key}) : super(key: key);
   @override
   _CupState createState() => _CupState();
 }
@@ -13,7 +16,7 @@ class _CupState extends State<Cup> {
 
   Future loadCupResults() async {
     final response = await http.get(
-        "https://cors-anywhere.herokuapp.com/https://cm.nzvb.nl/modules/nzvb/api/cup_results.php");
+        "https://thingproxy.freeboard.io/fetch/https://cm.nzvb.nl/modules/nzvb/api/cup_results.php");
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       var result = data[data.keys.first];
@@ -157,7 +160,10 @@ class _CupState extends State<Cup> {
                     }
                     if (data is MatchItem) {
                       return Container(
-                        color: Theme.of(context).backgroundColor,
+                        color: data.team1 == widget.selectedTeam ||
+                                data.team2 == widget.selectedTeam
+                            ? Theme.of(context).focusColor
+                            : Theme.of(context).backgroundColor,
                         height: 35,
                         padding: EdgeInsets.only(left: 10.0),
                         child: new Row(

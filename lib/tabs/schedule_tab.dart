@@ -6,27 +6,42 @@ import 'package:http/http.dart' as http;
 import 'package:date_format/date_format.dart';
 
 class ScheduleTab extends StatefulWidget {
+  final String selectedTeam;
+  final String activeSeasonId;
+
+  ScheduleTab(this.selectedTeam, this.activeSeasonId, {Key key})
+      : super(key: key);
   @override
   _ScheduleTabState createState() => _ScheduleTabState();
 }
 
 class _ScheduleTabState extends State<ScheduleTab>
     with AutomaticKeepAliveClientMixin<ScheduleTab> {
-  League _selectedLeague;
+  League _league;
 
   Future loadScheduleList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    _league = new League(prefs.getString("leagueId") ?? "0",
+        prefs.getString("leagueName") ?? "");
 
-    _selectedLeague = new League(prefs.getString('leagueId') ?? '0',
-        prefs.getString('leagueName') ?? 'HKA');
+    String _getScheduleUrl =
+        'https://thingproxy.freeboard.io/fetch/http://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=' +
+            widget.activeSeasonId +
+            '&pouleId=' +
+            _league.id;
 
-    if (_selectedLeague != null) {
-      final response = await http.get(
-          "https://cors-anywhere.herokuapp.com/http://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=7&pouleId=" +
-              _selectedLeague.id);
+    print(_getScheduleUrl);
+
+    if (_league != null) {
+      final response = await http.get(_getScheduleUrl);
       if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        return data['2020/2021'][_selectedLeague.name];
+        Map data = json.decode(response.body);
+
+        var activeSeasonName = data.entries
+            .firstWhere((k) => k.value.length != 0, orElse: () => null);
+        if (activeSeasonName == null) return null;
+
+        return data[activeSeasonName.key][_league.name];
       }
     }
     return null;

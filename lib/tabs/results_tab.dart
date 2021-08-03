@@ -6,27 +6,42 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class ResultsTab extends StatefulWidget {
+  final String selectedTeam;
+  final String activeSeasonId;
+
+  ResultsTab(this.selectedTeam, this.activeSeasonId, {Key key})
+      : super(key: key);
   @override
   _ResultsTabState createState() => _ResultsTabState();
 }
 
 class _ResultsTabState extends State<ResultsTab>
     with AutomaticKeepAliveClientMixin<ResultsTab> {
-  League _selectedLeague;
+  League _league;
 
   Future loadResultList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    _league = new League(prefs.getString("leagueId") ?? "0",
+        prefs.getString("leagueName") ?? "");
 
-    _selectedLeague = new League(prefs.getString('leagueId') ?? '0',
-        prefs.getString('leagueName') ?? 'HKA');
+    String _getResultsUrl =
+        'https://thingproxy.freeboard.io/fetch/http://cm.nzvb.nl/modules/nzvb/api/results.php?seasonId=' +
+            widget.activeSeasonId +
+            '&pouleId=' +
+            _league.id;
 
-    if (_selectedLeague != null) {
-      final response = await http.get(
-          "https://cors-anywhere.herokuapp.com/http://cm.nzvb.nl/modules/nzvb/api/results.php?seasonId=7&pouleId=" +
-              _selectedLeague.id);
+    print(_getResultsUrl);
+
+    if (_league != null) {
+      final response = await http.get(_getResultsUrl);
       if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        return data['2020/2021'][_selectedLeague.name];
+        Map data = json.decode(response.body);
+
+        var activeSeasonName = data.entries
+            .firstWhere((k) => k.value.length != 0, orElse: () => null);
+        if (activeSeasonName == null) return null;
+
+        return data[activeSeasonName.key][_league.name];
       }
     }
     return null;
