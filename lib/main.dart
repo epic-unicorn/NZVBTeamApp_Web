@@ -94,6 +94,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 _getSavedTeamName().then((teamName) {
                   setState(() => _selectedTeam = teamName);
                 });
+                _getLeagueName().then((leagueName) {
+                  setState(() => _leagueName = leagueName);
+                });
                 Navigator.pop(context);
               },
             ),
@@ -149,6 +152,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             Settings(_activeSeasonId)));
                 _getSavedTeamName().then((teamName) {
                   setState(() => _selectedTeam = teamName);
+                });
+                _getLeagueName().then((leagueName) {
+                  setState(() => _leagueName = leagueName);
                 });
               },
             ),

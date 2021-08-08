@@ -120,7 +120,10 @@ class _ResultsTabState extends State<ResultsTab>
                 return InkWell(
                     onTap: () {},
                     child: new Ink(
-                      color: Theme.of(context).backgroundColor,
+                      color: data['team1'] == widget.selectedTeam ||
+                              data['team2'] == widget.selectedTeam
+                          ? Theme.of(context).focusColor
+                          : Theme.of(context).backgroundColor,
                       height: 40,
                       padding: EdgeInsets.only(left: 10.0),
                       child: new Row(
