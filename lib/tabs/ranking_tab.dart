@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:NZVBTeamApp_Web/models/league.dart';
+import 'package:nzvb_team_app/models/league.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,7 +26,7 @@ class _RankingTabState extends State<RankingTab>
         prefs.getString("leagueName") ?? "");
 
     String _getRankingUrl =
-        'https://thingproxy.freeboard.io/fetch/http://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
+        'http://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             _league.id;
@@ -34,7 +34,7 @@ class _RankingTabState extends State<RankingTab>
     print(_getRankingUrl);
 
     if (_league != null) {
-      final response = await http.get(_getRankingUrl);
+      final response = await http.get(Uri.tryParse(_getRankingUrl));
       if (response.statusCode == 200) {
         Map data = json.decode(response.body);
 

@@ -1,12 +1,10 @@
-import 'package:NZVBTeamApp_Web/cup.dart';
-import 'package:NZVBTeamApp_Web/utils/theme_notifier.dart';
-import 'package:NZVBTeamApp_Web/utils/themes.dart';
-import 'package:NZVBTeamApp_Web/tabs/ranking_tab.dart';
-import 'package:NZVBTeamApp_Web/tabs/results_tab.dart';
-import 'package:NZVBTeamApp_Web/tabs/schedule_tab.dart';
+import 'package:nzvb_team_app/utils/theme_notifier.dart';
+import 'package:nzvb_team_app/utils/themes.dart';
+import 'package:nzvb_team_app/tabs/ranking_tab.dart';
+import 'package:nzvb_team_app/tabs/results_tab.dart';
+import 'package:nzvb_team_app/tabs/schedule_tab.dart';
 import 'package:flutter/material.dart';
-import 'package:NZVBTeamApp_Web/settings.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:nzvb_team_app/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
@@ -43,8 +41,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _selectedTeam;
   String _leagueName;
-  String _activeSeasonId =
-      '6'; // laatst gespeelde seizoen voor corona 2019/2020
+  String _activeSeasonId = '8'; // huidig actieve seizoen 2021/2022
 
   Future<String> _getSavedTeamName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -120,20 +117,17 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
           title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(_selectedTeam),
+              Text(_selectedTeam ?? 'NZVB Team App'),
               Text(' '),
-              Text(
-                _leagueName,
-                style: TextStyle(fontSize: 12),
-              )
+              Text(_leagueName ?? '', style: TextStyle(fontSize: 14))
             ],
           ),
           actions: <Widget>[
+            /*
             IconButton(
               icon: Icon(FontAwesome.trophy),
-              color: Theme.of(context).accentIconTheme.color,
+              color: Theme.of(context).iconTheme.color,
               onPressed: () async {
                 await Navigator.push(
                     context,
@@ -141,9 +135,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (BuildContext context) => Cup(_selectedTeam)));
               },
             ),
+            */
             IconButton(
               icon: Icon(Icons.settings),
-              color: Theme.of(context).accentIconTheme.color,
+              color: Theme.of(context).iconTheme.color,
               onPressed: () async {
                 await Navigator.push(
                     context,

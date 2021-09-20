@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:NZVBTeamApp_Web/models/league.dart';
+import 'package:nzvb_team_app/models/league.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:NZVBTeamApp_Web/utils/theme_notifier.dart';
-import 'package:NZVBTeamApp_Web/utils/themes.dart';
+import 'package:nzvb_team_app/utils/theme_notifier.dart';
+import 'package:nzvb_team_app/utils/themes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
@@ -28,8 +28,8 @@ class _SettingState extends State<Settings> {
 
   Future<List<League>> _getLeaguesFromActiveSeason() async {
     final String _pouleIdsUrl =
-        'https://thingproxy.freeboard.io/fetch/http://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
-    var res = await http.get(Uri.encodeFull(_pouleIdsUrl));
+        'http://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
+    var res = await http.get(Uri.tryParse(_pouleIdsUrl));
     Map resBody = jsonDecode(res.body);
     _leagues.clear();
 
@@ -47,11 +47,11 @@ class _SettingState extends State<Settings> {
 
   Future<List<String>> _getTeamsFromSelectedLeague(String leagueId) async {
     String _getTeamNamesUrl =
-        'https://thingproxy.freeboard.io/fetch/http://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
+        'http://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             leagueId;
-    var res = await http.get(Uri.encodeFull(_getTeamNamesUrl));
+    var res = await http.get(Uri.tryParse(_getTeamNamesUrl));
     Map resBody = jsonDecode(res.body);
     _teams.clear();
 

@@ -1,21 +1,21 @@
-name: NZVBTeamApp_Web
-description: NZVB Team App for Web
+name: nzvb_team_app
+description: NZVB team app on Flutter
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+2
+version: 3.6+31
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  url_launcher: ^5.5.1
-  shared_preferences: ^0.5.8
-  http: ^0.12.2
-  provider: ^4.3.2
-  date_format: ^1.0.8
+  url_launcher: ^6.0.11
+  shared_preferences: ^2.0.8
+  http: ^0.13.3
+  provider: ^6.0.0
+  date_format: ^2.0.4
   flutter_icons: ^1.1.0
 
   flutter:
@@ -23,7 +23,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.3
+  cupertino_icons: ^1.0.3
 
 dev_dependencies:
   flutter_test:

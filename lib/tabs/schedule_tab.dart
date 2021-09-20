@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:NZVBTeamApp_Web/models/league.dart';
+import 'package:nzvb_team_app/models/league.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -25,7 +25,7 @@ class _ScheduleTabState extends State<ScheduleTab>
         prefs.getString("leagueName") ?? "");
 
     String _getScheduleUrl =
-        'https://thingproxy.freeboard.io/fetch/http://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=' +
+        'http://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             _league.id;
@@ -33,7 +33,7 @@ class _ScheduleTabState extends State<ScheduleTab>
     print(_getScheduleUrl);
 
     if (_league != null) {
-      final response = await http.get(_getScheduleUrl);
+      final response = await http.get(Uri.tryParse(_getScheduleUrl));
       if (response.statusCode == 200) {
         Map data = json.decode(response.body);
 

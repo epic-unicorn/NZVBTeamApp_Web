@@ -16,7 +16,7 @@ class _CupState extends State<Cup> {
 
   Future loadCupResults() async {
     final response = await http.get(
-        "https://thingproxy.freeboard.io/fetch/https://cm.nzvb.nl/modules/nzvb/api/cup_results.php");
+        Uri.tryParse('https://cm.nzvb.nl/modules/nzvb/api/cup_results.php'));
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       var result = data[data.keys.first];

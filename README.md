@@ -1,3 +1,3 @@
-# NZVBTeamApp_Web
+# NZVB Team App
 
-## NZVBTeamApp gewoon op het web!
+NZVB Team App met Flutter voor iOS, Android en Web
