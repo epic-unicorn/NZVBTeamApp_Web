@@ -1,33 +1,30 @@
-import 'package:nzvb_team_app/utils/theme_notifier.dart';
-import 'package:nzvb_team_app/utils/themes.dart';
 import 'package:nzvb_team_app/tabs/ranking_tab.dart';
 import 'package:nzvb_team_app/tabs/results_tab.dart';
 import 'package:nzvb_team_app/tabs/schedule_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:nzvb_team_app/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences.getInstance().then((prefs) {
-    var darkModeOn = prefs.getBool('darkMode') ?? false;
-    runApp(
-      ChangeNotifierProvider<ThemeNotifier>(
-        create: (_) => ThemeNotifier(darkModeOn ? darkTheme : lightTheme),
-        child: MyNzvbApp(),
-      ),
-    );
-  });
+  runApp(
+    MyNzvbApp(),
+  );
 }
 
 class MyNzvbApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
       title: 'NZVB Team App',
-      theme: themeNotifier.getTheme(),
+      theme: ThemeData(
+        accentColor: Color(0xFFdb8a2d),
+        primaryColor: Color(0xFFdb8a2d),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(primary: Color(0xFFdb8a2d)),
+        ),
+        brightness: Brightness.dark,
+      ),
       home: MyHomePage(),
     );
   }
@@ -114,7 +111,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
           title: Row(
             children: [
@@ -138,7 +134,6 @@ class _MyHomePageState extends State<MyHomePage> {
             */
             IconButton(
               icon: Icon(Icons.settings),
-              color: Theme.of(context).iconTheme.color,
               onPressed: () async {
                 await Navigator.push(
                     context,

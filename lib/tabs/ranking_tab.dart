@@ -26,7 +26,7 @@ class _RankingTabState extends State<RankingTab>
         prefs.getString("leagueName") ?? "");
 
     String _getRankingUrl =
-        'http://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
+        'https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             _league.id;
@@ -59,9 +59,9 @@ class _RankingTabState extends State<RankingTab>
         child: Column(
       children: <Widget>[
         Container(
+          color: Theme.of(context).secondaryHeaderColor,
           padding: EdgeInsets.only(left: 10.0),
           height: 40,
-          color: Theme.of(context).secondaryHeaderColor,
           child: new Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
@@ -151,8 +151,8 @@ class _RankingTabState extends State<RankingTab>
                 final data = teamRanking.data[index];
                 return Container(
                   color: data['team_name'] == widget.selectedTeam
-                      ? Theme.of(context).focusColor
-                      : Theme.of(context).backgroundColor,
+                      ? Theme.of(context).accentColor
+                      : Theme.of(context).scaffoldBackgroundColor,
                   height: 40,
                   padding: EdgeInsets.only(left: 10.0),
                   child: new Row(

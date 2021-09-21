@@ -25,7 +25,7 @@ class _ScheduleTabState extends State<ScheduleTab>
         prefs.getString("leagueName") ?? "");
 
     String _getScheduleUrl =
-        'http://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=' +
+        'https://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             _league.id;
@@ -120,7 +120,10 @@ class _ScheduleTabState extends State<ScheduleTab>
                 return InkWell(
                     onTap: () {},
                     child: new Ink(
-                      color: Theme.of(context).backgroundColor,
+                      color: data['team1'] == widget.selectedTeam ||
+                              data['team2'] == widget.selectedTeam
+                          ? Theme.of(context).accentColor
+                          : Theme.of(context).scaffoldBackgroundColor,
                       height: 40,
                       padding: EdgeInsets.only(left: 10.0),
                       child: new Row(

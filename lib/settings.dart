@@ -3,10 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:nzvb_team_app/models/league.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nzvb_team_app/utils/theme_notifier.dart';
-import 'package:nzvb_team_app/utils/themes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
   String activeSeasonId;
@@ -18,17 +15,15 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingState extends State<Settings> {
-  var _darkTheme = false;
-
   League _selectedLeague;
   String _selectedTeamName;
 
-  List<League> _leagues = new List<League>();
-  List<String> _teams = new List<String>();
+  List<League> _leagues = <League>[];
+  List<String> _teams = <String>[];
 
   Future<List<League>> _getLeaguesFromActiveSeason() async {
     final String _pouleIdsUrl =
-        'http://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
+        'https://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
     var res = await http.get(Uri.tryParse(_pouleIdsUrl));
     Map resBody = jsonDecode(res.body);
     _leagues.clear();
@@ -47,7 +42,7 @@ class _SettingState extends State<Settings> {
 
   Future<List<String>> _getTeamsFromSelectedLeague(String leagueId) async {
     String _getTeamNamesUrl =
-        'http://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
+        'https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             leagueId;
@@ -87,7 +82,8 @@ class _SettingState extends State<Settings> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('leagueId', _selectedLeague.id);
     prefs.setString('leagueName', _selectedLeague.name);
-    prefs.setString('teamName', _selectedTeamName);
+    if (_selectedTeamName != null)
+      prefs.setString('teamName', _selectedTeamName);
     prefs.setString('activeSeasonId', widget.activeSeasonId);
   }
 
@@ -119,20 +115,9 @@ class _SettingState extends State<Settings> {
     super.initState();
   }
 
-  void onThemeChanged(bool value, ThemeNotifier themeNotifier) async {
-    (value)
-        ? themeNotifier.setTheme(darkTheme)
-        : themeNotifier.setTheme(lightTheme);
-    var prefs = await SharedPreferences.getInstance();
-    prefs.setBool('darkMode', value);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
-    _darkTheme = (themeNotifier.getTheme() == darkTheme);
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
           title: Text('Instellingen'),
           centerTitle: true,
@@ -143,9 +128,9 @@ class _SettingState extends State<Settings> {
             Container(height: 20),
             Text('Selecteer een competitie',
                 style: new TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).accentColor)),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                )),
             new DropdownButtonHideUnderline(
                 child: new FutureBuilder<List<League>>(
                     future: _getLeaguesFromActiveSeason(),
@@ -179,9 +164,9 @@ class _SettingState extends State<Settings> {
             Container(height: 20),
             Text('Selecteer een team',
                 style: new TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).accentColor)),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                )),
             new DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                   items: _teams.map((String teamName) {
@@ -202,26 +187,6 @@ class _SettingState extends State<Settings> {
             ),
             Container(
               height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('Donker thema',
-                    style: new TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).accentColor)),
-                Switch(
-                  activeColor: Theme.of(context).accentColor,
-                  value: _darkTheme,
-                  onChanged: (val) {
-                    setState(() {
-                      _darkTheme = val;
-                    });
-                    onThemeChanged(val, themeNotifier);
-                  },
-                ),
-              ],
             ),
           ],
         ));

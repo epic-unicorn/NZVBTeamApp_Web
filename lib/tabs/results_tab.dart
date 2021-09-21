@@ -25,7 +25,7 @@ class _ResultsTabState extends State<ResultsTab>
         prefs.getString("leagueName") ?? "");
 
     String _getResultsUrl =
-        'http://cm.nzvb.nl/modules/nzvb/api/results.php?seasonId=' +
+        'https://cm.nzvb.nl/modules/nzvb/api/results.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             _league.id;
@@ -122,8 +122,8 @@ class _ResultsTabState extends State<ResultsTab>
                     child: new Ink(
                       color: data['team1'] == widget.selectedTeam ||
                               data['team2'] == widget.selectedTeam
-                          ? Theme.of(context).focusColor
-                          : Theme.of(context).backgroundColor,
+                          ? Theme.of(context).accentColor
+                          : Theme.of(context).scaffoldBackgroundColor,
                       height: 40,
                       padding: EdgeInsets.only(left: 10.0),
                       child: new Row(
