@@ -12,7 +12,7 @@ class Cup extends StatefulWidget {
 }
 
 class _CupState extends State<Cup> {
-  List<ListItem> _cupResults = new List<ListItem>();
+  List<ListItem> _cupResults = <ListItem>[];
 
   Future loadCupResults() async {
     final response = await http.get(
