@@ -7,9 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MyNzvbApp(),
-  );
+  runApp(MyNzvbApp());
 }
 
 class MyNzvbApp extends StatelessWidget {
