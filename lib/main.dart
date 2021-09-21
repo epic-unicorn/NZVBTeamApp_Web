@@ -150,6 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
           bottom: TabBar(
+            indicatorColor: Color(0xFFdb8a2d),
             tabs: [
               Tab(text: 'Stand'),
               Tab(text: 'Programma'),
