@@ -23,7 +23,7 @@ class _SettingState extends State<Settings> {
 
   Future<List<League>> _getLeaguesFromActiveSeason() async {
     final String _pouleIdsUrl =
-        'http://api.allorigins.win/get?url=https://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
+        'https://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
     var res = await http.get(Uri.tryParse(_pouleIdsUrl));
     Map resBody = jsonDecode(res.body);
     _leagues.clear();

@@ -25,7 +25,7 @@ class _ResultsTabState extends State<ResultsTab>
         prefs.getString("leagueName") ?? "");
 
     String _getResultsUrl =
-        'http://api.allorigins.win/get?url=https://cm.nzvb.nl/modules/nzvb/api/results.php?seasonId=' +
+        'https://cm.nzvb.nl/modules/nzvb/api/results.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             _league.id;

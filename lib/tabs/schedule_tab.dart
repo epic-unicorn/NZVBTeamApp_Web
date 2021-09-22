@@ -25,7 +25,7 @@ class _ScheduleTabState extends State<ScheduleTab>
         prefs.getString("leagueName") ?? "");
 
     String _getScheduleUrl =
-        'http://api.allorigins.win/get?url=https://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=' +
+        'https://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             _league.id;
