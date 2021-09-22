@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:http/http.dart' as http;
+import 'package:nzvb_team_app/about.dart';
 import 'package:nzvb_team_app/models/league.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -121,6 +123,18 @@ class _SettingState extends State<Settings> {
         appBar: AppBar(
           title: Text('Instellingen'),
           centerTitle: true,
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(FontAwesome.info_circle),
+              color: Colors.white,
+              onPressed: () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => About()));
+              },
+            ),
+          ],
         ),
         body: ListView(
           padding: EdgeInsets.all(20),
