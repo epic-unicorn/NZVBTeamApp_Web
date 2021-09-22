@@ -26,7 +26,7 @@ class _RankingTabState extends State<RankingTab>
         prefs.getString("leagueName") ?? "");
 
     String _getRankingUrl =
-        'https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
+        'http://api.allorigins.win/get?url=https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
             _league.id;
