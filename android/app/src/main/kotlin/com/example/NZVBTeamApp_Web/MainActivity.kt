@@ -1,4 +1,4 @@
-package com.example.NZVBTeamApp_Web
+package nl.skylynx.nzvbteamapp
 
 import io.flutter.embedding.android.FlutterActivity
 
