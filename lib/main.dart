@@ -21,6 +21,8 @@ class MyNzvbApp extends StatelessWidget {
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(primary: Color(0xFFdb8a2d)),
         ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(primary: Color(0xFFdb8a2d))),
         brightness: Brightness.dark,
       ),
       home: MyHomePage(),
@@ -75,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: new Text("Nieuw seizoen"),
           content: new Text("Eerst even je team en competitie instellen."),
           actions: <Widget>[
-            new TextButton(
+            new ElevatedButton(
               child: new Text("OK"),
               onPressed: () async {
                 await Navigator.push(
