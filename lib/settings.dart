@@ -121,7 +121,7 @@ class _SettingState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Instellingen'),
+          title: Text('Team instellingen'),
           centerTitle: true,
           actions: <Widget>[
             IconButton(
