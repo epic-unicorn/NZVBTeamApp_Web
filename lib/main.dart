@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'package:nzvb_team_app/tabs/ranking_tab.dart';
 import 'package:nzvb_team_app/tabs/results_tab.dart';
 import 'package:nzvb_team_app/tabs/schedule_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:nzvb_team_app/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +40,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _selectedTeam;
   String _leagueName;
-  String _activeSeasonId = '8'; // huidig actieve seizoen 2021/2022
+  String _activeSeasonId = '0'; // default
 
   Future<String> _getSavedTeamName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -50,20 +52,23 @@ class _MyHomePageState extends State<MyHomePage> {
     return prefs.getString("leagueName") ?? "";
   }
 
-  Future<String> _getSavedActiveSeasonId() async {
+  Future<String> _getSavedSeasonId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString("activeSeasonId") ?? "0";
   }
 
   void _initializeLeagueAndTeam() {
-    _getSavedActiveSeasonId().then((seasonId) {
-      _getSavedTeamName().then((teamName) {
-        _getLeagueName().then((leagueName) {
-          if (teamName == "0" || seasonId != _activeSeasonId) {
-            showNewDialog();
-          }
-          setState(() => _selectedTeam = teamName);
-          setState(() => _leagueName = leagueName);
+    _getActiveSeasonId().then((activeSeasonId) {
+      _activeSeasonId = activeSeasonId;
+      _getSavedSeasonId().then((savedSeasonId) {
+        _getSavedTeamName().then((teamName) {
+          _getLeagueName().then((leagueName) {
+            if (teamName == "0" || savedSeasonId != _activeSeasonId) {
+              showNewDialog();
+            }
+            setState(() => _selectedTeam = teamName);
+            setState(() => _leagueName = leagueName);
+          });
         });
       });
     });
@@ -84,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            Settings(_activeSeasonId)));
+                            Settings(_activeSeasonId, true)));
                 _getSavedTeamName().then((teamName) {
                   setState(() => _selectedTeam = teamName);
                 });
@@ -100,6 +105,20 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future _getActiveSeasonId() async {
+    final response = await http
+        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php"));
+    if (response.statusCode == 200) {
+      Map data = json.decode(response.body);
+      var activeSeasonName = data.entries
+          .lastWhere((k) => k.value.length != 0, orElse: () => null);
+      if (activeSeasonName == null) return null;
+      debugPrint('Latest season ID: ' + activeSeasonName.key);
+      return activeSeasonName.key;
+    }
+    return "0";
+  }
+
   @override
   void initState() {
     _initializeLeagueAndTeam();
@@ -113,10 +132,14 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         appBar: AppBar(
           title: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(_selectedTeam ?? 'NZVB Team App'),
-              Text(' '),
-              Text(_leagueName ?? '', style: TextStyle(fontSize: 14))
+              Text('NZVB Team App '),
+              Text(_leagueName ?? ' ',
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFdb8a2d))),
             ],
           ),
           actions: <Widget>[
@@ -139,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            Settings(_activeSeasonId)));
+                            Settings(_activeSeasonId, false)));
                 _getSavedTeamName().then((teamName) {
                   setState(() => _selectedTeam = teamName);
                 });

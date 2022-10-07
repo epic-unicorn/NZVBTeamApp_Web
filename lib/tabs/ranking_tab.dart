@@ -31,7 +31,7 @@ class _RankingTabState extends State<RankingTab>
             '&pouleId=' +
             _league.id;
 
-    print(_getRankingUrl);
+    debugPrint(_getRankingUrl);
 
     if (_league != null) {
       final response = await http.get(Uri.tryParse(_getRankingUrl));

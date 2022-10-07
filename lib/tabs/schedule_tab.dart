@@ -30,7 +30,7 @@ class _ScheduleTabState extends State<ScheduleTab>
             '&pouleId=' +
             _league.id;
 
-    print(_getScheduleUrl);
+    debugPrint(_getScheduleUrl);
 
     if (_league != null) {
       final response = await http.get(Uri.tryParse(_getScheduleUrl));

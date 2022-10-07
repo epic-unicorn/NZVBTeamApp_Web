@@ -30,7 +30,7 @@ class _ResultsTabState extends State<ResultsTab>
             '&pouleId=' +
             _league.id;
 
-    print(_getResultsUrl);
+    debugPrint(_getResultsUrl);
 
     if (_league != null) {
       final response = await http.get(Uri.tryParse(_getResultsUrl));
