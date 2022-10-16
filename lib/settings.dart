@@ -3,17 +3,15 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:http/http.dart' as http;
 import 'package:nzvb_team_app/about.dart';
 import 'package:nzvb_team_app/models/league.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nzvb_team_app/models/season.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
-  String activeSeasonId;
+  String savedSeasonId;
   bool isSeasonSetup = false;
 
-  Settings(this.activeSeasonId, this.isSeasonSetup, {Key key})
-      : super(key: key);
+  Settings(this.savedSeasonId, this.isSeasonSetup, {Key key}) : super(key: key);
 
   @override
   _SettingState createState() => _SettingState();
@@ -22,6 +20,7 @@ class Settings extends StatefulWidget {
 class _SettingState extends State<Settings> {
   League _selectedLeague;
   String _selectedTeamName;
+  String _selectedSeasonId;
 
   List<League> _leagues = <League>[];
   List<String> _teams = <String>[];
@@ -35,22 +34,40 @@ class _SettingState extends State<Settings> {
       _seasons.clear();
 
       data.entries.forEach((season) {
-        //debugPrint(season.key + ' - ' + season.value);
         _seasons.add(Season(season.key, season.value));
       });
+
+      // auto select last season id when no season id is set
+      if (_selectedSeasonId == "0") {
+        _selectedSeasonId = _seasons.last.id;
+      }
     }
     return _seasons;
   }
 
-  Future<List<League>> _getLeaguesFromActiveSeason() async {
+  Future<List<League>> _getLeaguesFromSavedSeason() async {
     final String _pouleIdsUrl =
         'https://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
     var res = await http.get(Uri.tryParse(_pouleIdsUrl));
     Map resBody = jsonDecode(res.body);
     _leagues.clear();
 
-    var activeSeasonLeagues = resBody.entries
-        .firstWhere((k) => k.key == widget.activeSeasonId, orElse: () => null);
+    var activeSeasonLeagues;
+    if (_selectedSeasonId == "0") {
+      // sort to find last active season id
+      List<MapEntry<dynamic, dynamic>> sortedList = resBody.entries.toList()
+        ..sort((a, b) => a.key.compareTo(b.key));
+
+      var activeSeasonId = sortedList.last.key;
+      debugPrint('Active season ID: ' + activeSeasonId);
+
+      activeSeasonLeagues = resBody.entries
+          .firstWhere((k) => k.key == activeSeasonId, orElse: () => null);
+    } else {
+      activeSeasonLeagues = resBody.entries
+          .firstWhere((k) => k.key == _selectedSeasonId, orElse: () => null);
+    }
+
     if (activeSeasonLeagues == null) return _leagues;
 
     Map<String, String> values =
@@ -64,7 +81,7 @@ class _SettingState extends State<Settings> {
   Future<List<String>> _getTeamsFromSelectedLeague(String leagueId) async {
     String _getTeamNamesUrl =
         'https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
-            widget.activeSeasonId +
+            _selectedSeasonId +
             '&pouleId=' +
             leagueId;
     var res = await http.get(Uri.tryParse(_getTeamNamesUrl));
@@ -110,21 +127,32 @@ class _SettingState extends State<Settings> {
       prefs.setString('teamName', _selectedTeamName);
     }
 
-    prefs.setString('activeSeasonId', widget.activeSeasonId);
+    prefs.setString('savedSeasonId', _selectedSeasonId);
+  }
+
+  Future<String> _getSavedSeasonId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("savedSeasonId") ?? "0";
   }
 
   void _initializeSettingsPage() {
-    _getSavedLeagueId().then((leagueId) {
-      _getLeaguesFromActiveSeason().then((leagues) {
-        if (leagueId != '0' && !widget.isSeasonSetup) {
-          _getTeamsFromSelectedLeague(leagueId).then((teams) {
-            setState(() {
-              _teams = teams;
-              _selectedLeague = leagues.where((x) => x.id == leagueId).first;
-            });
-            _getTeamName();
+    _getSavedSeasonId().then((seasonId) {
+      _selectedSeasonId = seasonId;
+      _getSavedLeagueId().then((leagueId) {
+        _getLeaguesFromSavedSeason().then((leagues) {
+          setState(() {
+            _leagues = leagues;
           });
-        }
+          if (leagueId != '0' && !widget.isSeasonSetup) {
+            _getTeamsFromSelectedLeague(leagueId).then((teams) {
+              setState(() {
+                _teams = teams;
+                _selectedLeague = leagues.where((x) => x.id == leagueId).first;
+              });
+              _getTeamName();
+            });
+          }
+        });
       });
     });
   }
@@ -164,7 +192,6 @@ class _SettingState extends State<Settings> {
           padding: EdgeInsets.all(20),
           children: <Widget>[
             Container(height: 20),
-            /*
             Text('Selecteer seizoen',
                 style: new TextStyle(
                   fontSize: 16,
@@ -177,26 +204,29 @@ class _SettingState extends State<Settings> {
                         AsyncSnapshot<List<Season>> snapshot) {
                       if (!snapshot.hasData) return Container();
                       return DropdownButton<Season>(
-                        items: snapshot.data
-                            .map((season) => DropdownMenuItem<Season>(
-                                  child: Text(season.name),
-                                  value: season,
-                                ))
-                            .toList(),
-                        onChanged: (Season value) {
-                          _getLeaguesFromActiveSeason();
-                          widget.activeSeasonId = value.id;
+                          items: snapshot.data
+                              .map((season) => DropdownMenuItem<Season>(
+                                    child: Text(season.name),
+                                    value: season,
+                                  ))
+                              .toList(),
+                          onChanged: (Season value) {
+                            setState(() {
+                              _selectedSeasonId = value.id;
+                            });
 
-                          _saveSettings();
-                        },
-                        value: widget.activeSeasonId == '0'
-                            ? _seasons.last
-                            : _seasons
-                                .where((i) => i.id == widget.activeSeasonId)
-                                .first,
-                      );
+                            _getLeaguesFromSavedSeason().then((leagues) {
+                              setState(() => _leagues = leagues);
+                            });
+
+                            _saveSettings();
+                          },
+                          value: _selectedSeasonId == '0'
+                              ? _seasons.last
+                              : _seasons.firstWhere(
+                                  (i) => i.id == _selectedSeasonId,
+                                  orElse: () => null));
                     })),
-                    */
             Container(height: 20),
             Text('Selecteer competitie',
                 style: new TextStyle(
@@ -204,35 +234,28 @@ class _SettingState extends State<Settings> {
                   fontWeight: FontWeight.bold,
                 )),
             new DropdownButtonHideUnderline(
-                child: new FutureBuilder<List<League>>(
-                    future: _getLeaguesFromActiveSeason(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<League>> snapshot) {
-                      if (!snapshot.hasData) return Container();
-                      return DropdownButton<League>(
-                        items: snapshot.data
-                            .map((competition) => DropdownMenuItem<League>(
-                                  child: Text(competition.name),
-                                  value: competition,
-                                ))
-                            .toList(),
-                        onChanged: (League value) {
-                          _getTeamsFromSelectedLeague(value.id).then((teams) {
-                            setState(() => _teams = teams);
-                          });
-                          setState(() {
-                            _selectedLeague = value;
-                          });
+                child: DropdownButton<League>(
+              items: _leagues.map((League league) {
+                return DropdownMenuItem<League>(
+                  value: league,
+                  child: Text(league.name),
+                );
+              }).toList(),
+              onChanged: (League value) {
+                _getTeamsFromSelectedLeague(value.id).then((teams) {
+                  setState(() => _teams = teams);
+                });
+                setState(() {
+                  _selectedLeague = value;
+                });
 
-                          _saveSettings();
-                        },
-                        value: _selectedLeague == null
-                            ? _selectedLeague
-                            : _leagues.firstWhere(
-                                (i) => i.id == _selectedLeague.id,
-                                orElse: () => null),
-                      );
-                    })),
+                _saveSettings();
+              },
+              value: _selectedLeague == null
+                  ? _selectedLeague
+                  : _leagues.firstWhere((i) => i.id == _selectedLeague.id,
+                      orElse: () => null),
+            )),
             Container(height: 20),
             Text('Selecteer team',
                 style: new TextStyle(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:nzvb_team_app/models/season.dart';
 import 'package:nzvb_team_app/tabs/ranking_tab.dart';
 import 'package:nzvb_team_app/tabs/results_tab.dart';
 import 'package:nzvb_team_app/tabs/schedule_tab.dart';
@@ -40,7 +41,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _selectedTeam;
   String _leagueName;
-  String _activeSeasonId = '0'; // default
+  String _savedSeasonId = '0';
+  String _activeSeasonName;
 
   Future<String> _getSavedTeamName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -54,20 +56,38 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<String> _getSavedSeasonId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("savedSeasonId") ?? "0";
+  }
+
+  Future<String> _getActiveSeasonIdLegacy() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString("activeSeasonId") ?? "0";
   }
 
   void _initializeLeagueAndTeam() {
     _getActiveSeasonId().then((activeSeasonId) {
-      _activeSeasonId = activeSeasonId;
-      _getSavedSeasonId().then((savedSeasonId) {
-        _getSavedTeamName().then((teamName) {
-          _getLeagueName().then((leagueName) {
-            if (teamName == "0" || savedSeasonId != _activeSeasonId) {
-              showNewDialog();
+      _getActiveSeasonName(activeSeasonId).then((activeSeasonName) {
+        setState(() {
+          _activeSeasonName = activeSeasonName;
+        });
+        _getActiveSeasonIdLegacy().then((activeSeasonIdLegacy) {
+          _getSavedSeasonId().then((savedSeasonId) {
+            _savedSeasonId = savedSeasonId;
+            // legacy migration
+            if (activeSeasonIdLegacy != "0") {
+              _savedSeasonId = activeSeasonIdLegacy;
             }
-            setState(() => _selectedTeam = teamName);
-            setState(() => _leagueName = leagueName);
+            _getSavedTeamName().then((teamName) {
+              _getLeagueName().then((leagueName) {
+                if (teamName == "0" ||
+                    savedSeasonId != activeSeasonId ||
+                    _savedSeasonId == "0") {
+                  showNewDialog();
+                }
+                setState(() => _selectedTeam = teamName);
+                setState(() => _leagueName = leagueName);
+              });
+            });
           });
         });
       });
@@ -89,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            Settings(_activeSeasonId, true)));
+                            Settings(_savedSeasonId, true)));
                 _getSavedTeamName().then((teamName) {
                   setState(() => _selectedTeam = teamName);
                 });
@@ -110,13 +130,27 @@ class _MyHomePageState extends State<MyHomePage> {
         .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php"));
     if (response.statusCode == 200) {
       Map data = json.decode(response.body);
-      var activeSeasonName = data.entries
+      var activeSeason = data.entries
           .lastWhere((k) => k.value.length != 0, orElse: () => null);
-      if (activeSeasonName == null) return null;
-      debugPrint('Latest season ID: ' + activeSeasonName.key);
-      return activeSeasonName.key;
+      if (activeSeason == null) return null;
+      debugPrint('Latest season ID: ' + activeSeason.key);
+
+      return activeSeason.key;
     }
     return "0";
+  }
+
+  Future<String> _getActiveSeasonName(String seasonId) async {
+    final response = await http
+        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php"));
+    if (response.statusCode == 200) {
+      Map data = json.decode(response.body);
+
+      return data.entries
+          .firstWhere((element) => element.key == seasonId)
+          .value;
+    }
+    return "";
   }
 
   @override
@@ -140,6 +174,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFFdb8a2d))),
+              Text(' '),
+              Text(_activeSeasonName ?? ' ',
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.grey)),
             ],
           ),
           actions: <Widget>[
@@ -162,7 +202,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            Settings(_activeSeasonId, false)));
+                            Settings(_savedSeasonId, false)));
+
+                _getSavedSeasonId().then((savedSeasonId) {
+                  setState(() => _savedSeasonId = savedSeasonId);
+                });
+
+                _getActiveSeasonName(_savedSeasonId).then((seasonName) {
+                  setState(() {
+                    _activeSeasonName = seasonName;
+                  });
+                });
+
                 _getSavedTeamName().then((teamName) {
                   setState(() => _selectedTeam = teamName);
                 });
@@ -183,9 +234,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: TabBarView(
           children: [
-            RankingTab(_selectedTeam, _activeSeasonId),
-            ScheduleTab(_selectedTeam, _activeSeasonId),
-            ResultsTab(_selectedTeam, _activeSeasonId),
+            RankingTab(_selectedTeam, _savedSeasonId),
+            ScheduleTab(_selectedTeam, _savedSeasonId),
+            ResultsTab(_selectedTeam, _savedSeasonId),
           ],
         ),
       ),
