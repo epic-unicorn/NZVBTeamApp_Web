@@ -8,8 +8,10 @@ import 'package:http/http.dart' as http;
 class ResultsTab extends StatefulWidget {
   final String selectedTeam;
   final String activeSeasonId;
+  final String activeSeasonName;
 
-  ResultsTab(this.selectedTeam, this.activeSeasonId, {Key key})
+  ResultsTab(this.selectedTeam, this.activeSeasonId, this.activeSeasonName,
+      {Key key})
       : super(key: key);
   @override
   _ResultsTabState createState() => _ResultsTabState();
@@ -37,11 +39,12 @@ class _ResultsTabState extends State<ResultsTab>
       if (response.statusCode == 200) {
         Map data = json.decode(response.body);
 
-        var activeSeasonName = data.entries
-            .firstWhere((k) => k.value.length != 0, orElse: () => null);
-        if (activeSeasonName == null) return null;
+        var activeSeason = data.entries.firstWhere(
+            (k) => k.key == widget.activeSeasonName,
+            orElse: () => null);
+        if (activeSeason == null) return null;
 
-        return data[activeSeasonName.key][_league.name];
+        return data[activeSeason.key][_league.name];
       }
     }
     return null;
