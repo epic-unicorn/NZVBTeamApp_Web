@@ -5,7 +5,7 @@ description: NZVB team app on Flutter
 # pub.dev using `pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 4.0.1+35
+version: 4.0.2+36
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -15,7 +15,7 @@ dependencies:
   http: ^0.13.3
   date_format: ^2.0.4
   url_launcher: ^6.0.11
-  package_info: ^2.0.2
+  package_info_plus: ^3.0.2
   flutter_icons: ^1.1.0
 
   flutter:
