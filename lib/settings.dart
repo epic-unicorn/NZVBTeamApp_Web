@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:http/http.dart' as http;
 import 'package:nzvb_team_app/about.dart';
 import 'package:nzvb_team_app/models/league.dart';
