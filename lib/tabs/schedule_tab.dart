@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:nzvb_team_app/models/league.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,10 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:date_format/date_format.dart';
 
 class ScheduleTab extends StatefulWidget {
-  final String selectedTeam;
+  final String? selectedTeam;
   final String activeSeasonId;
 
-  ScheduleTab(this.selectedTeam, this.activeSeasonId, {Key key})
+  ScheduleTab(this.selectedTeam, this.activeSeasonId, {Key? key})
       : super(key: key);
   @override
   _ScheduleTabState createState() => _ScheduleTabState();
@@ -17,7 +18,7 @@ class ScheduleTab extends StatefulWidget {
 
 class _ScheduleTabState extends State<ScheduleTab>
     with AutomaticKeepAliveClientMixin<ScheduleTab> {
-  League _league;
+  League? _league;
 
   Future loadScheduleList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -28,20 +29,20 @@ class _ScheduleTabState extends State<ScheduleTab>
         'https://cm.nzvb.nl/modules/nzvb/api/schedule.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
-            _league.id;
+            _league!.id;
 
     debugPrint(_getScheduleUrl);
 
     if (_league != null) {
-      final response = await http.get(Uri.tryParse(_getScheduleUrl));
+      final response = await http.get(Uri.tryParse(_getScheduleUrl)!);
       if (response.statusCode == 200) {
         Map data = json.decode(response.body);
 
-        var activeSeasonName = data.entries
-            .firstWhere((k) => k.value.length != 0, orElse: () => null);
+        var activeSeasonName =
+            data.entries.firstWhereOrNull((k) => k.value.length != 0);
         if (activeSeasonName == null) return null;
 
-        return data[activeSeasonName.key][_league.name];
+        return data[activeSeasonName.key][_league!.name];
       }
     }
     return null;
@@ -109,71 +110,72 @@ class _ScheduleTabState extends State<ScheduleTab>
         ),
         Expanded(
             child: FutureBuilder(
-          builder: (context, teamSchedule) {
-            if (teamSchedule.data == null) {
-              return Container();
-            }
-            return ListView.builder(
-              itemCount: teamSchedule.data.length,
-              itemBuilder: (BuildContext context, int index) {
-                final data = teamSchedule.data[index];
-                return InkWell(
-                    onTap: () {},
-                    child: new Ink(
-                      color: data['team1'] == widget.selectedTeam ||
-                              data['team2'] == widget.selectedTeam
-                          ? Theme.of(context).accentColor
-                          : Theme.of(context).scaffoldBackgroundColor,
-                      height: 40,
-                      padding: EdgeInsets.only(left: 10.0),
-                      child: new Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              formatDate(DateTime.parse(data['date']), [
-                                dd,
-                                '-',
-                                mm,
-                              ]),
-                            ),
-                            flex: 1,
-                          ),
-                          Expanded(
-                            child: Text(
-                              data['start'],
-                            ),
-                            flex: 1,
-                          ),
-                          Expanded(
-                            child: Text(
-                              data['team1'],
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            flex: 3,
-                          ),
-                          Expanded(
-                            child: Text(
-                              data['team2'],
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            flex: 3,
-                          ),
-                          Expanded(
-                            child: Text(
-                              data['location'],
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            flex: 1,
-                          ),
-                        ],
-                      ),
-                    ));
-              },
-            );
-          },
-          future: loadScheduleList(),
-        ))
+                future: loadScheduleList(),
+                builder: (BuildContext ctx, AsyncSnapshot<dynamic> snapshot) =>
+                    snapshot.hasData
+                        ? ListView.builder(
+                            itemCount: snapshot.data.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final data = snapshot.data[index];
+                              return InkWell(
+                                  onTap: () {},
+                                  child: new Ink(
+                                    color: data['team1'] ==
+                                                widget.selectedTeam ||
+                                            data['team2'] == widget.selectedTeam
+                                        ? Theme.of(context).accentColor
+                                        : Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                    height: 40,
+                                    padding: EdgeInsets.only(left: 10.0),
+                                    child: new Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Text(
+                                            formatDate(
+                                                DateTime.parse(data['date']), [
+                                              dd,
+                                              '-',
+                                              mm,
+                                            ]),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            data['start'],
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            data['team1'],
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          flex: 3,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            data['team2'],
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          flex: 3,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            data['location'],
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          flex: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ));
+                            },
+                          )
+                        : Container()))
       ],
     ));
   }

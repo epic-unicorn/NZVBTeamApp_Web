@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:http/http.dart' as http;
 import 'package:nzvb_team_app/about.dart';
@@ -11,24 +12,24 @@ class Settings extends StatefulWidget {
   String savedSeasonId;
   bool isSeasonSetup = false;
 
-  Settings(this.savedSeasonId, this.isSeasonSetup, {Key key}) : super(key: key);
+  Settings(this.savedSeasonId, this.isSeasonSetup, {Key? key}) : super(key: key);
 
   @override
   _SettingState createState() => _SettingState();
 }
 
 class _SettingState extends State<Settings> {
-  League _selectedLeague;
-  String _selectedTeamName;
-  String _selectedSeasonId;
+  League? _selectedLeague;
+  String? _selectedTeamName;
+  String? _selectedSeasonId;
 
   List<League> _leagues = <League>[];
-  List<String> _teams = <String>[];
+  List<String?> _teams = <String?>[];
   List<Season> _seasons = <Season>[];
 
   Future<List<Season>> _getSeasons() async {
     final response = await http
-        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php"));
+        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php")!);
     if (response.statusCode == 200) {
       Map data = json.decode(response.body);
       _seasons.clear();
@@ -48,24 +49,24 @@ class _SettingState extends State<Settings> {
   Future<List<League>> _getLeaguesFromSavedSeason() async {
     final String _pouleIdsUrl =
         'https://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
-    var res = await http.get(Uri.tryParse(_pouleIdsUrl));
-    Map resBody = jsonDecode(res.body);
+    var res = await http.get(Uri.tryParse(_pouleIdsUrl)!);
+    Map? resBody = jsonDecode(res.body);
     _leagues.clear();
 
     var activeSeasonLeagues;
     if (_selectedSeasonId == "0") {
       // sort to find last active season id
-      List<MapEntry<dynamic, dynamic>> sortedList = resBody.entries.toList()
+      List<MapEntry<dynamic, dynamic>> sortedList = resBody!.entries.toList()
         ..sort((a, b) => a.key.compareTo(b.key));
 
       var activeSeasonId = sortedList.last.key;
       debugPrint('Active season ID: ' + activeSeasonId);
 
       activeSeasonLeagues = resBody.entries
-          .firstWhere((k) => k.key == activeSeasonId, orElse: () => null);
+          .firstWhereOrNull((k) => k.key == activeSeasonId);
     } else {
-      activeSeasonLeagues = resBody.entries
-          .firstWhere((k) => k.key == _selectedSeasonId, orElse: () => null);
+      activeSeasonLeagues = resBody!.entries
+          .firstWhereOrNull((k) => k.key == _selectedSeasonId);
     }
 
     if (activeSeasonLeagues == null) return _leagues;
@@ -78,18 +79,18 @@ class _SettingState extends State<Settings> {
     return _leagues;
   }
 
-  Future<List<String>> _getTeamsFromSelectedLeague(String leagueId) async {
+  Future<List<String?>> _getTeamsFromSelectedLeague(String leagueId) async {
     String _getTeamNamesUrl =
         'https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
-            _selectedSeasonId +
+            _selectedSeasonId! +
             '&pouleId=' +
             leagueId;
-    var res = await http.get(Uri.tryParse(_getTeamNamesUrl));
+    var res = await http.get(Uri.tryParse(_getTeamNamesUrl)!);
     Map resBody = jsonDecode(res.body);
     _teams.clear();
 
     var activeSeasonName = resBody.entries
-        .firstWhere((k) => k.value.length != 0, orElse: () => null);
+        .firstWhereOrNull((k) => k.value.length != 0);
     if (activeSeasonName == null) return _teams;
 
     var result = resBody[activeSeasonName.key].map((key, value) =>
@@ -120,14 +121,14 @@ class _SettingState extends State<Settings> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     if (_selectedLeague != null) {
-      prefs.setString('leagueId', _selectedLeague.id);
-      prefs.setString('leagueName', _selectedLeague.name);
+      prefs.setString('leagueId', _selectedLeague!.id);
+      prefs.setString('leagueName', _selectedLeague!.name);
     }
     if (_selectedTeamName != null) {
-      prefs.setString('teamName', _selectedTeamName);
+      prefs.setString('teamName', _selectedTeamName!);
     }
 
-    prefs.setString('savedSeasonId', _selectedSeasonId);
+    prefs.setString('savedSeasonId', _selectedSeasonId!);
   }
 
   Future<String> _getSavedSeasonId() async {
@@ -204,15 +205,15 @@ class _SettingState extends State<Settings> {
                         AsyncSnapshot<List<Season>> snapshot) {
                       if (!snapshot.hasData) return Container();
                       return DropdownButton<Season>(
-                          items: snapshot.data
+                          items: snapshot.data!
                               .map((season) => DropdownMenuItem<Season>(
                                     child: Text(season.name),
                                     value: season,
                                   ))
                               .toList(),
-                          onChanged: (Season value) {
+                          onChanged: (Season? value) {
                             setState(() {
-                              _selectedSeasonId = value.id;
+                              _selectedSeasonId = value!.id;
                             });
 
                             _getLeaguesFromSavedSeason().then((leagues) {
@@ -223,9 +224,8 @@ class _SettingState extends State<Settings> {
                           },
                           value: _selectedSeasonId == '0'
                               ? _seasons.last
-                              : _seasons.firstWhere(
-                                  (i) => i.id == _selectedSeasonId,
-                                  orElse: () => null));
+                              : _seasons.firstWhereOrNull(
+                                  (i) => i.id == _selectedSeasonId));
                     })),
             Container(height: 20),
             Text('Selecteer competitie',
@@ -241,8 +241,8 @@ class _SettingState extends State<Settings> {
                   child: Text(league.name),
                 );
               }).toList(),
-              onChanged: (League value) {
-                _getTeamsFromSelectedLeague(value.id).then((teams) {
+              onChanged: (League? value) {
+                _getTeamsFromSelectedLeague(value!.id).then((teams) {
                   setState(() => _teams = teams);
                 });
                 setState(() {
@@ -253,8 +253,7 @@ class _SettingState extends State<Settings> {
               },
               value: _selectedLeague == null
                   ? _selectedLeague
-                  : _leagues.firstWhere((i) => i.id == _selectedLeague.id,
-                      orElse: () => null),
+                  : _leagues.firstWhereOrNull((i) => i.id == _selectedLeague!.id),
             )),
             Container(height: 20),
             Text('Selecteer team',
@@ -264,13 +263,13 @@ class _SettingState extends State<Settings> {
                 )),
             new DropdownButtonHideUnderline(
               child: DropdownButton<String>(
-                  items: _teams.map((String teamName) {
+                  items: _teams.map((String? teamName) {
                     return DropdownMenuItem<String>(
                       value: teamName,
-                      child: Text(teamName),
+                      child: Text(teamName!),
                     );
                   }).toList(),
-                  onChanged: (String team) {
+                  onChanged: (String? team) {
                     setState(() {
                       _selectedTeamName = team;
                     });

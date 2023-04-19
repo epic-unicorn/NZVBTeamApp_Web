@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:nzvb_team_app/models/league.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
@@ -6,12 +7,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class ResultsTab extends StatefulWidget {
-  final String selectedTeam;
+  final String? selectedTeam;
   final String activeSeasonId;
-  final String activeSeasonName;
+  final String? activeSeasonName;
 
   ResultsTab(this.selectedTeam, this.activeSeasonId, this.activeSeasonName,
-      {Key key})
+      {Key? key})
       : super(key: key);
   @override
   _ResultsTabState createState() => _ResultsTabState();
@@ -19,7 +20,7 @@ class ResultsTab extends StatefulWidget {
 
 class _ResultsTabState extends State<ResultsTab>
     with AutomaticKeepAliveClientMixin<ResultsTab> {
-  League _league;
+  League? _league;
 
   Future loadResultList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -30,21 +31,20 @@ class _ResultsTabState extends State<ResultsTab>
         'https://cm.nzvb.nl/modules/nzvb/api/results.php?seasonId=' +
             widget.activeSeasonId +
             '&pouleId=' +
-            _league.id;
+            _league!.id;
 
     debugPrint(_getResultsUrl);
 
     if (_league != null) {
-      final response = await http.get(Uri.tryParse(_getResultsUrl));
+      final response = await http.get(Uri.tryParse(_getResultsUrl)!);
       if (response.statusCode == 200) {
         Map data = json.decode(response.body);
 
-        var activeSeason = data.entries.firstWhere(
-            (k) => k.key == widget.activeSeasonName,
-            orElse: () => null);
+        var activeSeason = data.entries
+            .firstWhereOrNull((k) => k.key == widget.activeSeasonName);
         if (activeSeason == null) return null;
 
-        return data[activeSeason.key][_league.name];
+        return data[activeSeason.key][_league!.name];
       }
     }
     return null;
@@ -112,66 +112,67 @@ class _ResultsTabState extends State<ResultsTab>
         ),
         Expanded(
             child: FutureBuilder(
-          builder: (context, teamResult) {
-            if (teamResult.data == null) {
-              return Container();
-            }
-            return ListView.builder(
-              itemCount: teamResult.data.length,
-              itemBuilder: (BuildContext context, int index) {
-                final data = teamResult.data[index];
-                return InkWell(
-                    onTap: () {},
-                    child: new Ink(
-                      color: data['team1'] == widget.selectedTeam ||
-                              data['team2'] == widget.selectedTeam
-                          ? Theme.of(context).accentColor
-                          : Theme.of(context).scaffoldBackgroundColor,
-                      height: 40,
-                      padding: EdgeInsets.only(left: 10.0),
-                      child: new Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              formatDate(DateTime.parse(data['date']), [
-                                dd,
-                                '-',
-                                mm,
-                              ]),
-                            ),
-                            flex: 1,
-                          ),
-                          Expanded(
-                            child: Text(data['time']),
-                            flex: 1,
-                          ),
-                          Expanded(
-                            child: Text(
-                              data['team1'],
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            flex: 3,
-                          ),
-                          Expanded(
-                            child: Text(
-                              data['team2'],
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            flex: 3,
-                          ),
-                          Expanded(
-                            child: Text(data['result']),
-                            flex: 1,
-                          ),
-                        ],
-                      ),
-                    ));
-              },
-            );
-          },
-          future: loadResultList(),
-        ))
+                future: loadResultList(),
+                builder: (BuildContext ctx, AsyncSnapshot<dynamic> snapshot) =>
+                    snapshot.hasData
+                        ? ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final data = snapshot.data[index];
+                              return InkWell(
+                                  onTap: () {},
+                                  child: new Ink(
+                                    color: data['team1'] ==
+                                                widget.selectedTeam ||
+                                            data['team2'] == widget.selectedTeam
+                                        ? Theme.of(context).accentColor
+                                        : Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                    height: 40,
+                                    padding: EdgeInsets.only(left: 10.0),
+                                    child: new Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Text(
+                                            formatDate(
+                                                DateTime.parse(data['date']), [
+                                              dd,
+                                              '-',
+                                              mm,
+                                            ]),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Text(data['time']),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            data['team1'],
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          flex: 3,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            data['team2'],
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          flex: 3,
+                                        ),
+                                        Expanded(
+                                          child: Text(data['result']),
+                                          flex: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ));
+                            },
+                          )
+                        : Container()))
       ],
     ));
   }

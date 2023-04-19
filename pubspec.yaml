@@ -5,10 +5,10 @@ description: NZVB team app on Flutter
 # pub.dev using `pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 4.0.2+36
+version: 4.0.3+37
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   shared_preferences: ^2.0.8
@@ -24,6 +24,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.3
+  collection: ^1.15.0-nullsafety.4
 
 dev_dependencies:
   flutter_launcher_icons: ^0.11.0

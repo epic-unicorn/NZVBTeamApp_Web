@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:nzvb_team_app/tabs/ranking_tab.dart';
 import 'package:nzvb_team_app/tabs/results_tab.dart';
 import 'package:nzvb_team_app/tabs/schedule_tab.dart';
@@ -38,10 +39,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _selectedTeam;
-  String _leagueName;
+  String? _selectedTeam;
+  String? _leagueName;
   String _savedSeasonId = '0';
-  String _activeSeasonName;
+  String? _activeSeasonName;
 
   Future<String> _getSavedTeamName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -130,11 +131,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future _getActiveSeasonId() async {
     final response = await http
-        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php"));
+        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php")!);
     if (response.statusCode == 200) {
       Map data = json.decode(response.body);
       var activeSeason = data.entries
-          .lastWhere((k) => k.value.length != 0, orElse: () => null);
+          .lastWhereOrNull((k) => k.value.length != 0);
       if (activeSeason == null) return null;
       debugPrint('Latest season ID: ' + activeSeason.key);
 
@@ -145,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<String> _getActiveSeasonName(String seasonId) async {
     final response = await http
-        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php"));
+        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php")!);
     if (response.statusCode == 200 && seasonId != "0") {
       Map data = json.decode(response.body);
 

@@ -6,7 +6,7 @@ import 'dart:convert';
 class Cup extends StatefulWidget {
   final String selectedTeam;
 
-  Cup(this.selectedTeam, {Key key}) : super(key: key);
+  Cup(this.selectedTeam, {Key? key}) : super(key: key);
   @override
   _CupState createState() => _CupState();
 }
@@ -16,7 +16,7 @@ class _CupState extends State<Cup> {
 
   Future loadCupResults() async {
     final response = await http.get(
-        Uri.tryParse('https://cm.nzvb.nl/modules/nzvb/api/cup_results.php'));
+        Uri.tryParse('https://cm.nzvb.nl/modules/nzvb/api/cup_results.php')!);
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       var result = data[data.keys.first];
@@ -54,7 +54,7 @@ class _CupState extends State<Cup> {
     return test.length > 0;
   }
 
-  bool matchExist(String date, String team1, String team2, String result) {
+  bool matchExist(String? date, String? team1, String? team2, String? result) {
     var test = _cupResults.whereType<MatchItem>().where((x) =>
         x.date == date &&
         x.team1 == team1 &&
@@ -133,84 +133,87 @@ class _CupState extends State<Cup> {
             ),
             Expanded(
                 child: FutureBuilder(
-              builder: (context, cupResult) {
-                if (cupResult.data == null) {
-                  return Container();
-                }
-                return ListView.builder(
-                  itemCount: cupResult.data.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final data = cupResult.data[index];
-                    if (data is HeadingItem) {
-                      return Container(
-                        color: Theme.of(context).secondaryHeaderColor,
-                        height: 35,
-                        padding: EdgeInsets.only(left: 10.0),
-                        child: new Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              'Ronde ' + data.heading,
-                              style: new TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 12),
-                            )
-                          ],
-                        ),
-                      );
-                    }
-                    if (data is MatchItem) {
-                      return Container(
-                        color: data.team1 == widget.selectedTeam ||
-                                data.team2 == widget.selectedTeam
-                            ? Theme.of(context).focusColor
-                            : Theme.of(context).backgroundColor,
-                        height: 35,
-                        padding: EdgeInsets.only(left: 10.0),
-                        child: new Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                formatDate(DateTime.parse(data.date), [
-                                  dd,
-                                  '-',
-                                  mm,
-                                ]),
-                              ),
-                              flex: 1,
-                            ),
-                            Expanded(
-                              child: Text(data.time),
-                              flex: 1,
-                            ),
-                            Expanded(
-                              child: Text(
-                                data.team1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              flex: 3,
-                            ),
-                            Expanded(
-                              child: Text(
-                                data.team2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              flex: 3,
-                            ),
-                            Expanded(
-                              child: Text(data.result),
-                              flex: 1,
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    return Container();
-                  },
-                );
-              },
-              future: loadCupResults(),
-            )),
+                    future: loadCupResults(),
+                    builder: (BuildContext ctx,
+                            AsyncSnapshot<dynamic> snapshot) =>
+                        snapshot.hasData
+                            ? ListView.builder(
+                                itemCount: snapshot.data.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final data = snapshot.data[index];
+                                  if (data is HeadingItem) {
+                                    return Container(
+                                      color: Theme.of(context)
+                                          .secondaryHeaderColor,
+                                      height: 35,
+                                      padding: EdgeInsets.only(left: 10.0),
+                                      child: new Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text(
+                                            'Ronde ' + data.heading,
+                                            style: new TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                  if (data is MatchItem) {
+                                    return Container(
+                                      color: data.team1 ==
+                                                  widget.selectedTeam ||
+                                              data.team2 == widget.selectedTeam
+                                          ? Theme.of(context).focusColor
+                                          : Theme.of(context).backgroundColor,
+                                      height: 35,
+                                      padding: EdgeInsets.only(left: 10.0),
+                                      child: new Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: Text(
+                                              formatDate(
+                                                  DateTime.parse(data.date!), [
+                                                dd,
+                                                '-',
+                                                mm,
+                                              ]),
+                                            ),
+                                            flex: 1,
+                                          ),
+                                          Expanded(
+                                            child: Text(data.time!),
+                                            flex: 1,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              data.team1!,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            flex: 3,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              data.team2!,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            flex: 3,
+                                          ),
+                                          Expanded(
+                                            child: Text(data.result!),
+                                            flex: 1,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                              )
+                            : Container()))
           ],
         ));
   }
@@ -224,14 +227,14 @@ class HeadingItem implements ListItem {
 }
 
 class MatchItem implements ListItem {
-  final String date;
-  final String time;
-  final String team1;
-  final String team2;
-  final String result;
+  final String? date;
+  final String? time;
+  final String? team1;
+  final String? team2;
+  final String? result;
 
   MatchItem(this.date, this.time, this.team1, this.team2, this.result);
 
   @override
-  List<Object> get props => [date, time, team1, team2, result];
+  List<Object?> get props => [date, time, team1, team2, result];
 }
