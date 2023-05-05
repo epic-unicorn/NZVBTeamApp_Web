@@ -11,11 +11,12 @@ class ResultsTab extends StatefulWidget {
   final String activeSeasonId;
   final String? activeSeasonName;
 
-  ResultsTab(this.selectedTeam, this.activeSeasonId, this.activeSeasonName,
+  const ResultsTab(
+      this.selectedTeam, this.activeSeasonId, this.activeSeasonName,
       {Key? key})
       : super(key: key);
   @override
-  _ResultsTabState createState() => _ResultsTabState();
+  State<ResultsTab> createState() => _ResultsTabState();
 }
 
 class _ResultsTabState extends State<ResultsTab>
@@ -24,19 +25,16 @@ class _ResultsTabState extends State<ResultsTab>
 
   Future loadResultList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _league = new League(prefs.getString("leagueId") ?? "0",
+    _league = League(prefs.getString("leagueId") ?? "0",
         prefs.getString("leagueName") ?? "");
 
-    String _getResultsUrl =
-        'https://cm.nzvb.nl/modules/nzvb/api/results.php?seasonId=' +
-            widget.activeSeasonId +
-            '&pouleId=' +
-            _league!.id;
+    String getResultsUrl =
+        'https://cm.nzvb.nl/modules/nzvb/api/results.php?seasonId=${widget.activeSeasonId}&pouleId=${_league!.id}';
 
-    debugPrint(_getResultsUrl);
+    debugPrint(getResultsUrl);
 
     if (_league != null) {
-      final response = await http.get(Uri.tryParse(_getResultsUrl)!);
+      final response = await http.get(Uri.tryParse(getResultsUrl)!);
       if (response.statusCode == 200) {
         Map data = json.decode(response.body);
 
@@ -51,61 +49,51 @@ class _ResultsTabState extends State<ResultsTab>
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Column(
+    super.build(context);
+    return Column(
       children: <Widget>[
         Container(
-          padding: EdgeInsets.only(left: 10.0),
+          padding: const EdgeInsets.only(left: 10.0),
           height: 40,
           color: Theme.of(context).secondaryHeaderColor,
-          child: new Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
+            children: const <Widget>[
               Expanded(
+                flex: 1,
                 child: Text(
                   'Datum',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
-                flex: 1,
               ),
               Expanded(
+                flex: 1,
                 child: Text(
                   'Tijd',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
-                flex: 1,
               ),
               Expanded(
+                flex: 3,
                 child: Text(
                   'Thuis',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
-                flex: 3,
               ),
               Expanded(
+                flex: 3,
                 child: Text(
                   'Uit',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
-                flex: 3,
               ),
               Expanded(
+                flex: 1,
                 child: Text(
                   'Uitslag',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
-                flex: 1,
               ),
             ],
           ),
@@ -121,20 +109,23 @@ class _ResultsTabState extends State<ResultsTab>
                               final data = snapshot.data[index];
                               return InkWell(
                                   onTap: () {},
-                                  child: new Ink(
+                                  child: Ink(
                                     color: data['team1'] ==
                                                 widget.selectedTeam ||
                                             data['team2'] == widget.selectedTeam
-                                        ? Theme.of(context).accentColor
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .secondary
                                         : Theme.of(context)
                                             .scaffoldBackgroundColor,
                                     height: 40,
-                                    padding: EdgeInsets.only(left: 10.0),
-                                    child: new Row(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: <Widget>[
                                         Expanded(
+                                          flex: 1,
                                           child: Text(
                                             formatDate(
                                                 DateTime.parse(data['date']), [
@@ -143,29 +134,28 @@ class _ResultsTabState extends State<ResultsTab>
                                               mm,
                                             ]),
                                           ),
-                                          flex: 1,
                                         ),
                                         Expanded(
+                                          flex: 1,
                                           child: Text(data['time']),
-                                          flex: 1,
                                         ),
                                         Expanded(
+                                          flex: 3,
                                           child: Text(
                                             data['team1'],
                                             overflow: TextOverflow.ellipsis,
                                           ),
-                                          flex: 3,
                                         ),
                                         Expanded(
+                                          flex: 3,
                                           child: Text(
                                             data['team2'],
                                             overflow: TextOverflow.ellipsis,
                                           ),
-                                          flex: 3,
                                         ),
                                         Expanded(
-                                          child: Text(data['result']),
                                           flex: 1,
+                                          child: Text(data['result']),
                                         ),
                                       ],
                                     ),
@@ -174,7 +164,7 @@ class _ResultsTabState extends State<ResultsTab>
                           )
                         : Container()))
       ],
-    ));
+    );
   }
 
   @override

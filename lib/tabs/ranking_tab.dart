@@ -9,10 +9,10 @@ class RankingTab extends StatefulWidget {
   final String? selectedTeam;
   final String activeSeasonId;
 
-  RankingTab(this.selectedTeam, this.activeSeasonId, {Key? key})
+  const RankingTab(this.selectedTeam, this.activeSeasonId, {Key? key})
       : super(key: key);
   @override
-  _RankingTabState createState() => _RankingTabState();
+  State<RankingTab> createState() => _RankingTabState();
 }
 
 class _RankingTabState extends State<RankingTab>
@@ -21,19 +21,16 @@ class _RankingTabState extends State<RankingTab>
 
   Future loadRankingList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _league = new League(prefs.getString("leagueId") ?? "0",
+    _league = League(prefs.getString("leagueId") ?? "0",
         prefs.getString("leagueName") ?? "");
 
-    String _getRankingUrl =
-        'https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
-            widget.activeSeasonId +
-            '&pouleId=' +
-            _league!.id;
+    String getRankingUrl =
+        'https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=${widget.activeSeasonId}&pouleId=${_league!.id}';
 
-    debugPrint(_getRankingUrl);
+    debugPrint(getRankingUrl);
 
     if (_league != null) {
-      final response = await http.get(Uri.tryParse(_getRankingUrl)!);
+      final response = await http.get(Uri.tryParse(getRankingUrl)!);
       if (response.statusCode == 200) {
         Map data = json.decode(response.body);
 
@@ -48,91 +45,76 @@ class _RankingTabState extends State<RankingTab>
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Column(
+    super.build(context);
+    return Column(
       children: <Widget>[
         Container(
           color: Theme.of(context).secondaryHeaderColor,
-          padding: EdgeInsets.only(left: 10.0),
+          padding: const EdgeInsets.only(left: 10.0),
           height: 40,
-          child: new Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
+            children: const <Widget>[
               Expanded(
                 child: Text(
                   '#',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               Expanded(
+                flex: 5,
                 child: Text(
                   'Team',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
-                flex: 5,
               ),
               Expanded(
                 child: Text(
                   'G',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               Expanded(
                 child: Text(
                   'W',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               Expanded(
                 child: Text(
                   'GL',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               Expanded(
                 child: Text(
                   'V',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               Expanded(
                 child: Text(
                   'P',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               Expanded(
                 child: Text(
                   'DPV',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               Expanded(
                 child: Text(
                   'DPT',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
               Expanded(
                 child: Text(
                   'PM',
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
@@ -149,11 +131,11 @@ class _RankingTabState extends State<RankingTab>
                               final data = snapshot.data[index];
                               return Container(
                                 color: data['team_name'] == widget.selectedTeam
-                                    ? Theme.of(context).accentColor
+                                    ? Theme.of(context).colorScheme.secondary
                                     : Theme.of(context).scaffoldBackgroundColor,
                                 height: 40,
-                                padding: EdgeInsets.only(left: 10.0),
-                                child: new Row(
+                                padding: const EdgeInsets.only(left: 10.0),
+                                child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     Expanded(
@@ -162,52 +144,37 @@ class _RankingTabState extends State<RankingTab>
                                           : data['nr'].toString()),
                                     ),
                                     Expanded(
+                                      flex: 5,
                                       child: Text(
                                         data['team_name'],
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      flex: 5,
                                     ),
                                     Expanded(
-                                      child: Text(data['played'] == null
-                                          ? '0'
-                                          : data['played']),
+                                      child: Text(data['played'] ?? '0'),
                                     ),
                                     Expanded(
-                                      child: Text(data['won'] == null
-                                          ? '0'
-                                          : data['won']),
+                                      child: Text(data['won'] ?? '0'),
                                     ),
                                     Expanded(
-                                      child: Text(data['tied'] == null
-                                          ? '0'
-                                          : data['tied']),
+                                      child: Text(data['tied'] ?? '0'),
                                     ),
                                     Expanded(
-                                      child: Text(data['lost'] == null
-                                          ? '0'
-                                          : data['lost']),
+                                      child: Text(data['lost'] ?? '0'),
                                     ),
                                     Expanded(
-                                      child: Text(data['match_points'] == null
-                                          ? '0'
-                                          : data['match_points']),
+                                      child: Text(data['match_points'] ?? '0'),
                                     ),
                                     Expanded(
-                                      child: Text(data['goals_total'] == null
-                                          ? '0'
-                                          : data['goals_total']),
+                                      child: Text(data['goals_total'] ?? '0'),
                                     ),
                                     Expanded(
                                       child: Text(
-                                          data['opponent_goals_total'] == null
-                                              ? '0'
-                                              : data['opponent_goals_total']),
+                                          data['opponent_goals_total'] ?? '0'),
                                     ),
                                     Expanded(
-                                      child: Text(data['penalty_points'] == null
-                                          ? '0'
-                                          : data['penalty_points']),
+                                      child:
+                                          Text(data['penalty_points'] ?? '0'),
                                     ),
                                   ],
                                 ),
@@ -216,7 +183,7 @@ class _RankingTabState extends State<RankingTab>
                           )
                         : Container()))
       ],
-    ));
+    );
   }
 
   @override

@@ -6,13 +6,14 @@ import 'dart:convert';
 class Cup extends StatefulWidget {
   final String selectedTeam;
 
-  Cup(this.selectedTeam, {Key? key}) : super(key: key);
+  const Cup(this.selectedTeam, {Key? key}) : super(key: key);
+
   @override
-  _CupState createState() => _CupState();
+  State<Cup> createState() => _CupState();
 }
 
 class _CupState extends State<Cup> {
-  List<ListItem> _cupResults = <ListItem>[];
+  final List<ListItem> _cupResults = <ListItem>[];
 
   Future loadCupResults() async {
     final response = await http.get(
@@ -22,25 +23,25 @@ class _CupState extends State<Cup> {
       var result = data[data.keys.first];
       for (var game = 0; game < result.length; game++) {
         var items = result[game];
-        if (_cupResults.length != 0) {
+        if (_cupResults.isNotEmpty) {
           if (!roundExist(items['round'].toString())) {
-            _cupResults.add(new HeadingItem(items['round'].toString()));
+            _cupResults.add(HeadingItem(items['round'].toString()));
             if (!matchExist(items['date'], items['team1'], items['team2'],
                 items['result'])) {
-              _cupResults.add(new MatchItem(items['date'], items['start'],
+              _cupResults.add(MatchItem(items['date'], items['start'],
                   items['team1'], items['team2'], items['result']));
             }
           } else {
             if (!matchExist(items['date'], items['team1'], items['team2'],
                 items['result'])) {
-              _cupResults.add(new MatchItem(items['date'], items['start'],
+              _cupResults.add(MatchItem(items['date'], items['start'],
                   items['team1'], items['team2'], items['result']));
             }
           }
         } else {
           // eerste wedstrijd in lijst, hoeven we niet te checken of die al bestaan
-          _cupResults.add(new HeadingItem(items['round'].toString()));
-          _cupResults.add(new MatchItem(items['date'], items['start'],
+          _cupResults.add(HeadingItem(items['round'].toString()));
+          _cupResults.add(MatchItem(items['date'], items['start'],
               items['team1'], items['team2'], items['result']));
         }
       }
@@ -51,7 +52,7 @@ class _CupState extends State<Cup> {
   bool roundExist(String name) {
     var test =
         _cupResults.whereType<HeadingItem>().where((x) => x.heading == name);
-    return test.length > 0;
+    return test.isNotEmpty;
   }
 
   bool matchExist(String? date, String? team1, String? team2, String? result) {
@@ -60,7 +61,7 @@ class _CupState extends State<Cup> {
         x.team1 == team1 &&
         x.team2 == team2 &&
         x.result == result);
-    return test.length > 0;
+    return test.isNotEmpty;
   }
 
   @override
@@ -74,59 +75,59 @@ class _CupState extends State<Cup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(
-          title: Text('Beker programma'),
+          title: const Text('Beker programma'),
           centerTitle: true,
         ),
         body: Column(
           children: <Widget>[
             Container(
-              padding: EdgeInsets.only(left: 10.0),
+              padding: const EdgeInsets.only(left: 10.0),
               height: 38,
               color: Theme.of(context).secondaryHeaderColor,
-              child: new Row(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
+                children: const <Widget>[
                   Expanded(
+                    flex: 1,
                     child: Text(
                       'Datum',
-                      style: new TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     ),
-                    flex: 1,
                   ),
                   Expanded(
+                    flex: 1,
                     child: Text(
                       'Tijd',
-                      style: new TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     ),
-                    flex: 1,
                   ),
                   Expanded(
+                    flex: 3,
                     child: Text(
                       'Thuis',
-                      style: new TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     ),
-                    flex: 3,
                   ),
                   Expanded(
+                    flex: 3,
                     child: Text(
                       'Uit',
-                      style: new TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     ),
-                    flex: 3,
                   ),
                   Expanded(
+                    flex: 1,
                     child: Text(
                       'Uitslag',
-                      style: new TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     ),
-                    flex: 1,
                   ),
                 ],
               ),
@@ -146,14 +147,15 @@ class _CupState extends State<Cup> {
                                       color: Theme.of(context)
                                           .secondaryHeaderColor,
                                       height: 35,
-                                      padding: EdgeInsets.only(left: 10.0),
-                                      child: new Row(
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
+                                      child: Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: <Widget>[
                                           Text(
-                                            'Ronde ' + data.heading,
-                                            style: new TextStyle(
+                                            'Ronde ${data.heading}',
+                                            style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 12),
                                           )
@@ -167,14 +169,18 @@ class _CupState extends State<Cup> {
                                                   widget.selectedTeam ||
                                               data.team2 == widget.selectedTeam
                                           ? Theme.of(context).focusColor
-                                          : Theme.of(context).backgroundColor,
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .background,
                                       height: 35,
-                                      padding: EdgeInsets.only(left: 10.0),
-                                      child: new Row(
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
+                                      child: Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: <Widget>[
                                           Expanded(
+                                            flex: 1,
                                             child: Text(
                                               formatDate(
                                                   DateTime.parse(data.date!), [
@@ -183,34 +189,34 @@ class _CupState extends State<Cup> {
                                                 mm,
                                               ]),
                                             ),
-                                            flex: 1,
                                           ),
                                           Expanded(
+                                            flex: 1,
                                             child: Text(data.time!),
-                                            flex: 1,
                                           ),
                                           Expanded(
+                                            flex: 3,
                                             child: Text(
                                               data.team1!,
                                               overflow: TextOverflow.ellipsis,
                                             ),
-                                            flex: 3,
                                           ),
                                           Expanded(
+                                            flex: 3,
                                             child: Text(
                                               data.team2!,
                                               overflow: TextOverflow.ellipsis,
                                             ),
-                                            flex: 3,
                                           ),
                                           Expanded(
-                                            child: Text(data.result!),
                                             flex: 1,
+                                            child: Text(data.result!),
                                           ),
                                         ],
                                       ),
                                     );
                                   }
+                                  return null;
                                 },
                               )
                             : Container()))
@@ -235,6 +241,5 @@ class MatchItem implements ListItem {
 
   MatchItem(this.date, this.time, this.team1, this.team2, this.result);
 
-  @override
   List<Object?> get props => [date, time, team1, team2, result];
 }

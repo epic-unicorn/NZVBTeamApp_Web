@@ -10,32 +10,40 @@ import 'package:http/http.dart' as http;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyNzvbApp());
+  runApp(const MyNzvbApp());
 }
 
 class MyNzvbApp extends StatelessWidget {
+  const MyNzvbApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'NZVB Team App',
       theme: ThemeData(
-        accentColor: Color(0xFFdb8a2d),
-        primaryColor: Color(0xFFdb8a2d),
+        primaryColor: const Color(0xFFdb8a2d),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: Color(0xFFdb8a2d)),
+          style: TextButton.styleFrom(foregroundColor: const Color(0xFFdb8a2d)),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(primary: Color(0xFFdb8a2d))),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFdb8a2d))),
         brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+            primary: const Color(0xFFdb8a2d),
+            secondary: const Color(0xFFdb8a2d),
+            brightness: Brightness.dark),
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key}) : super(key: key);
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -97,11 +105,11 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: new Text("Nieuw seizoen"),
-          content: new Text("Eerst even je team en competitie instellen."),
+          title: const Text("Nieuw seizoen"),
+          content: const Text("Eerst even je team en competitie instellen."),
           actions: <Widget>[
-            new ElevatedButton(
-              child: new Text("OK"),
+            ElevatedButton(
+              child: const Text("OK"),
               onPressed: () async {
                 await Navigator.push(
                     context,
@@ -130,14 +138,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future _getActiveSeasonId() async {
-    final response = await http
-        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php")!);
+    final response = await http.get(
+        Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php")!);
     if (response.statusCode == 200) {
       Map data = json.decode(response.body);
-      var activeSeason = data.entries
-          .lastWhereOrNull((k) => k.value.length != 0);
+      var activeSeason =
+          data.entries.lastWhereOrNull((k) => k.value.length != 0);
       if (activeSeason == null) return null;
-      debugPrint('Latest season ID: ' + activeSeason.key);
+      debugPrint('Latest season ID: ${activeSeason.key}');
 
       return activeSeason.key;
     }
@@ -145,8 +153,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<String> _getActiveSeasonName(String seasonId) async {
-    final response = await http
-        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php")!);
+    final response = await http.get(
+        Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php")!);
     if (response.statusCode == 200 && seasonId != "0") {
       Map data = json.decode(response.body);
 
@@ -169,18 +177,24 @@ class _MyHomePageState extends State<MyHomePage> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('NZVB Team App '),
+              const Text(
+                'NZVB Team App ',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
               Text(_leagueName ?? ' ',
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFFdb8a2d))),
-              Text(' '),
+              const Text(' '),
               Text(_activeSeasonName ?? ' ',
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.normal,
                       color: Colors.grey)),
@@ -200,7 +214,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             */
             IconButton(
-              icon: Icon(Icons.settings),
+              icon: const Icon(Icons.settings),
+              color: Colors.white,
               onPressed: () async {
                 await Navigator.push(
                     context,
@@ -226,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
           ],
-          bottom: TabBar(
+          bottom: const TabBar(
             indicatorColor: Color(0xFFdb8a2d),
             tabs: [
               Tab(text: 'Stand'),

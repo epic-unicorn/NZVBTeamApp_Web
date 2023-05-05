@@ -9,13 +9,14 @@ import 'package:nzvb_team_app/models/season.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
-  String savedSeasonId;
+  final String savedSeasonId;
   bool isSeasonSetup = false;
 
-  Settings(this.savedSeasonId, this.isSeasonSetup, {Key? key}) : super(key: key);
+  Settings(this.savedSeasonId, this.isSeasonSetup, {Key? key})
+      : super(key: key);
 
   @override
-  _SettingState createState() => _SettingState();
+  State<Settings> createState() => _SettingState();
 }
 
 class _SettingState extends State<Settings> {
@@ -25,18 +26,18 @@ class _SettingState extends State<Settings> {
 
   List<League> _leagues = <League>[];
   List<String?> _teams = <String?>[];
-  List<Season> _seasons = <Season>[];
+  final List<Season> _seasons = <Season>[];
 
   Future<List<Season>> _getSeasons() async {
-    final response = await http
-        .get(Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php")!);
+    final response = await http.get(
+        Uri.tryParse("http://cm.nzvb.nl/modules/nzvb/api/season_ids.php")!);
     if (response.statusCode == 200) {
       Map data = json.decode(response.body);
       _seasons.clear();
 
-      data.entries.forEach((season) {
+      for (var season in data.entries) {
         _seasons.add(Season(season.key, season.value));
-      });
+      }
 
       // auto select last season id when no season id is set
       if (_selectedSeasonId == "0") {
@@ -47,26 +48,26 @@ class _SettingState extends State<Settings> {
   }
 
   Future<List<League>> _getLeaguesFromSavedSeason() async {
-    final String _pouleIdsUrl =
+    const String pouleIdsUrl =
         'https://cm.nzvb.nl/modules/nzvb/api/poule_ids.php';
-    var res = await http.get(Uri.tryParse(_pouleIdsUrl)!);
+    var res = await http.get(Uri.tryParse(pouleIdsUrl)!);
     Map? resBody = jsonDecode(res.body);
     _leagues.clear();
 
-    var activeSeasonLeagues;
+    MapEntry? activeSeasonLeagues;
     if (_selectedSeasonId == "0") {
       // sort to find last active season id
       List<MapEntry<dynamic, dynamic>> sortedList = resBody!.entries.toList()
         ..sort((a, b) => a.key.compareTo(b.key));
 
       var activeSeasonId = sortedList.last.key;
-      debugPrint('Active season ID: ' + activeSeasonId);
+      debugPrint('Active season ID: $activeSeasonId');
 
-      activeSeasonLeagues = resBody.entries
-          .firstWhereOrNull((k) => k.key == activeSeasonId);
+      activeSeasonLeagues =
+          resBody.entries.firstWhereOrNull((k) => k.key == activeSeasonId);
     } else {
-      activeSeasonLeagues = resBody!.entries
-          .firstWhereOrNull((k) => k.key == _selectedSeasonId);
+      activeSeasonLeagues =
+          resBody!.entries.firstWhereOrNull((k) => k.key == _selectedSeasonId);
     }
 
     if (activeSeasonLeagues == null) return _leagues;
@@ -80,17 +81,14 @@ class _SettingState extends State<Settings> {
   }
 
   Future<List<String?>> _getTeamsFromSelectedLeague(String leagueId) async {
-    String _getTeamNamesUrl =
-        'https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=' +
-            _selectedSeasonId! +
-            '&pouleId=' +
-            leagueId;
-    var res = await http.get(Uri.tryParse(_getTeamNamesUrl)!);
+    String getTeamNamesUrl =
+        'https://cm.nzvb.nl/modules/nzvb/api/rankings.php?seasonId=${_selectedSeasonId!}&pouleId=$leagueId';
+    var res = await http.get(Uri.tryParse(getTeamNamesUrl)!);
     Map resBody = jsonDecode(res.body);
     _teams.clear();
 
-    var activeSeasonName = resBody.entries
-        .firstWhereOrNull((k) => k.value.length != 0);
+    var activeSeasonName =
+        resBody.entries.firstWhereOrNull((k) => k.value.length != 0);
     if (activeSeasonName == null) return _teams;
 
     var result = resBody[activeSeasonName.key].map((key, value) =>
@@ -98,7 +96,7 @@ class _SettingState extends State<Settings> {
 
     for (var key in result.keys) {
       List<dynamic> x = result[key];
-      if (x.length > 0) {
+      if (x.isNotEmpty) {
         for (var team in x) {
           _teams.add(team['team_name']);
         }
@@ -174,32 +172,34 @@ class _SettingState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Team instellingen'),
+          title: const Text('Team instellingen'),
+          foregroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           centerTitle: true,
           actions: <Widget>[
             IconButton(
-              icon: Icon(FontAwesome.info_circle),
+              icon: const Icon(FontAwesome.info_circle),
               color: Colors.white,
               onPressed: () async {
                 await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (BuildContext context) => About()));
+                        builder: (BuildContext context) => const About()));
               },
             ),
           ],
         ),
         body: ListView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           children: <Widget>[
             Container(height: 20),
-            Text('Selecteer seizoen',
-                style: new TextStyle(
+            const Text('Selecteer seizoen',
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 )),
-            new DropdownButtonHideUnderline(
-                child: new FutureBuilder<List<Season>>(
+            DropdownButtonHideUnderline(
+                child: FutureBuilder<List<Season>>(
                     future: _getSeasons(),
                     builder: (BuildContext context,
                         AsyncSnapshot<List<Season>> snapshot) {
@@ -207,8 +207,8 @@ class _SettingState extends State<Settings> {
                       return DropdownButton<Season>(
                           items: snapshot.data!
                               .map((season) => DropdownMenuItem<Season>(
-                                    child: Text(season.name),
                                     value: season,
+                                    child: Text(season.name),
                                   ))
                               .toList(),
                           onChanged: (Season? value) {
@@ -228,12 +228,12 @@ class _SettingState extends State<Settings> {
                                   (i) => i.id == _selectedSeasonId));
                     })),
             Container(height: 20),
-            Text('Selecteer competitie',
-                style: new TextStyle(
+            const Text('Selecteer competitie',
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 )),
-            new DropdownButtonHideUnderline(
+            DropdownButtonHideUnderline(
                 child: DropdownButton<League>(
               items: _leagues.map((League league) {
                 return DropdownMenuItem<League>(
@@ -253,15 +253,16 @@ class _SettingState extends State<Settings> {
               },
               value: _selectedLeague == null
                   ? _selectedLeague
-                  : _leagues.firstWhereOrNull((i) => i.id == _selectedLeague!.id),
+                  : _leagues
+                      .firstWhereOrNull((i) => i.id == _selectedLeague!.id),
             )),
             Container(height: 20),
-            Text('Selecteer team',
-                style: new TextStyle(
+            const Text('Selecteer team',
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 )),
-            new DropdownButtonHideUnderline(
+            DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                   items: _teams.map((String? teamName) {
                     return DropdownMenuItem<String>(
@@ -275,7 +276,7 @@ class _SettingState extends State<Settings> {
                     });
                     _saveSettings();
                   },
-                  value: _teams.where((i) => i == _selectedTeamName).length > 0
+                  value: _teams.where((i) => i == _selectedTeamName).isNotEmpty
                       ? _selectedTeamName
                       : null),
             ),

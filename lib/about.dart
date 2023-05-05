@@ -3,12 +3,25 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class About extends StatefulWidget {
+  const About({Key? key}) : super(key: key);
+
   @override
-  _AboutState createState() => _AboutState();
+  State<About> createState() => _AboutState();
+}
+
+Future<void> _launchInBrowser(Uri url) async {
+  debugPrint('Try to launch $url');
+
+  if (!await launchUrl(
+    url,
+    mode: LaunchMode.externalApplication,
+  )) {
+    debugPrint('Could not launch $url');
+  }
 }
 
 class _AboutState extends State<About> {
-  PackageInfo _packageInfo = new PackageInfo(
+  PackageInfo _packageInfo = PackageInfo(
       appName: 'appName',
       packageName: 'packageName',
       version: 'version',
@@ -28,33 +41,37 @@ class _AboutState extends State<About> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: Text('Over deze app'),
+          title: const Text('Over deze app'),
+          foregroundColor: Colors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           centerTitle: true,
         ),
         body: ListView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           children: <Widget>[
             Container(height: 30),
-            Text('App version : ' + _packageInfo.version,
-                style: new TextStyle(
+            Text('App version : ${_packageInfo.version}',
+                style: const TextStyle(
                   fontSize: 16,
                 )),
             Container(height: 10),
-            Text('Build number : ' + _packageInfo.buildNumber,
-                style: new TextStyle(
+            Text('Build number : ${_packageInfo.buildNumber}',
+                style: const TextStyle(
                   fontSize: 16,
                 )),
             Container(height: 30),
             InkWell(
-                child: new Text(
+                child: const Text(
                   'Klik hier voor privacy beleid.',
-                  style: new TextStyle(
+                  style: TextStyle(
                       fontSize: 16, decoration: TextDecoration.underline),
                 ),
-                onTap: () => launch(
-                    'https://sites.google.com/view/nzvbteamapp-privacypolicy/home')),
+                onTap: () => _launchInBrowser(Uri(
+                    scheme: 'https',
+                    host: 'sites.google.com',
+                    path: 'view/nzvbteamapp-privacypolicy/home')))
           ],
         ));
   }
