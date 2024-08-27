@@ -3,6 +3,7 @@ import 'package:collection/collection.dart' show IterableExtension;
 import 'package:nzvb_team_app/tabs/ranking_tab.dart';
 import 'package:nzvb_team_app/tabs/results_tab.dart';
 import 'package:nzvb_team_app/tabs/schedule_tab.dart';
+import 'package:nzvb_team_app/cup.dart';
 import 'package:flutter/material.dart';
 import 'package:nzvb_team_app/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,6 +30,16 @@ class MyNzvbApp extends StatelessWidget {
             style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFdb8a2d))),
         brightness: Brightness.dark,
+        textTheme: const TextTheme(
+            titleLarge: TextStyle(fontSize: 24, color: Colors.white),
+            titleMedium: TextStyle(fontSize: 20, color: Colors.white),
+            titleSmall: TextStyle(fontSize: 14, color: Colors.white),
+            bodyMedium: TextStyle(fontSize: 14, color: Colors.white),
+            bodySmall: TextStyle(fontSize: 14, color: Colors.white)),
+        scaffoldBackgroundColor: const Color(0xFF222222),
+        secondaryHeaderColor: const Color(0xFF666666),
+        tabBarTheme: const TabBarTheme(
+            labelColor: Colors.white, unselectedLabelColor: Colors.white),
         colorScheme: ColorScheme.fromSwatch().copyWith(
             primary: const Color(0xFFdb8a2d),
             secondary: const Color(0xFFdb8a2d),
@@ -201,18 +212,17 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           actions: <Widget>[
-            /*
             IconButton(
-              icon: Icon(FontAwesome.trophy),
+              icon: const Icon(Icons.emoji_events),
               color: Theme.of(context).iconTheme.color,
               onPressed: () async {
                 await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (BuildContext context) => Cup(_selectedTeam)));
+                        builder: (BuildContext context) =>
+                            Cup(_selectedTeam!)));
               },
             ),
-            */
             IconButton(
               icon: const Icon(Icons.settings),
               color: Colors.white,

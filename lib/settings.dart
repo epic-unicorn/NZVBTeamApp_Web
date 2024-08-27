@@ -205,6 +205,7 @@ class _SettingState extends State<Settings> {
                         AsyncSnapshot<List<Season>> snapshot) {
                       if (!snapshot.hasData) return Container();
                       return DropdownButton<Season>(
+                          dropdownColor: const Color(0xFFdb8a2d),
                           items: snapshot.data!
                               .map((season) => DropdownMenuItem<Season>(
                                     value: season,
@@ -235,6 +236,7 @@ class _SettingState extends State<Settings> {
                 )),
             DropdownButtonHideUnderline(
                 child: DropdownButton<League>(
+              dropdownColor: const Color(0xFFdb8a2d),
               items: _leagues.map((League league) {
                 return DropdownMenuItem<League>(
                   value: league,
@@ -264,6 +266,7 @@ class _SettingState extends State<Settings> {
                 )),
             DropdownButtonHideUnderline(
               child: DropdownButton<String>(
+                  dropdownColor: const Color(0xFFdb8a2d),
                   items: _teams.map((String? teamName) {
                     return DropdownMenuItem<String>(
                       value: teamName,

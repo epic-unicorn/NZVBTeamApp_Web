@@ -75,20 +75,21 @@ class _CupState extends State<Cup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: const Text('Beker programma'),
-          centerTitle: true,
-        ),
+            title: const Text('Beker programma'),
+            foregroundColor: Colors.white,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            centerTitle: true),
         body: Column(
           children: <Widget>[
             Container(
               padding: const EdgeInsets.only(left: 10.0),
               height: 38,
               color: Theme.of(context).secondaryHeaderColor,
-              child: Row(
+              child: const Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const <Widget>[
+                children: <Widget>[
                   Expanded(
                     flex: 1,
                     child: Text(
