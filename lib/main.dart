@@ -212,6 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           actions: <Widget>[
+            /*
             IconButton(
               icon: const Icon(Icons.emoji_events),
               color: Theme.of(context).iconTheme.color,
@@ -222,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (BuildContext context) =>
                             Cup(_selectedTeam!)));
               },
-            ),
+            ), */
             IconButton(
               icon: const Icon(Icons.settings),
               color: Colors.white,
