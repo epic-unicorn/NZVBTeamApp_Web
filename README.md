@@ -6,4 +6,4 @@ Google Play Store link:
 https://play.google.com/store/apps/details?id=nl.skylynx.nzvbteamapp
 
 Web link:
-https://epic-unicorn.github.io/NZVBTeamApp_Web/
+https://epic-unicorn.github.io/NZVBTeamApp_Web/   >> broken because of CORS issue
